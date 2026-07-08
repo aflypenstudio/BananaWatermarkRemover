@@ -15,7 +15,7 @@ const STATE = {
         scale: 1.0       // 0.1 ~ 2.0 - Logo 縮放比例 (預設 1.0)
     },
     downloadFormat: 'png', // 'png' or 'jpeg' - 全域下載格式設定
-    resizePreset: '', // '' | '1280x720' | '1920x1080' - 自動縮小預設尺寸
+    resizePreset: '1280x720', // '' | '1280x720' | '1920x1080' - 自動縮小預設尺寸
 };
 
 // Global DOM Elements

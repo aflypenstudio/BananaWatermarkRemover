@@ -41,9 +41,9 @@ const translations = {
         "positionNew": "新版邊距 (192px/96px)",
         "positionOld": "舊版邊距 (64px/32px)",
         "resizeLabel": "自動縮小:",
-        "resizeOff": "關閉",
-        "resize1280x720": "1280×720 / 720×1280",
-        "resize1920x1080": "1920×1080 / 1080×1920"
+        "resizeOff": "關閉縮小",
+        "resize1280x720": "1280×720",
+        "resize1920x1080": "1920×1080"
     },
     "zh-CN": {
         "appTitle": "Gemini 水印去除器 & 自动缩小",
@@ -87,9 +87,9 @@ const translations = {
         "positionNew": "新版边距 (192px/96px)",
         "positionOld": "旧版边距 (64px/32px)",
         "resizeLabel": "自动缩小:",
-        "resizeOff": "关闭",
-        "resize1280x720": "1280×720 / 720×1280",
-        "resize1920x1080": "1920×1080 / 1080×1920"
+        "resizeOff": "关闭缩小",
+        "resize1280x720": "1280×720",
+        "resize1920x1080": "1920×1080"
     },
     "en": {
         "appTitle": "Gemini Watermark Remover & Auto Resize",
@@ -134,8 +134,8 @@ const translations = {
         "positionOld": "Old Margin (64px/32px)",
         "resizeLabel": "Auto Resize:",
         "resizeOff": "Off",
-        "resize1280x720": "1280×720 / 720×1280",
-        "resize1920x1080": "1920×1080 / 1080×1920"
+        "resize1280x720": "1280×720",
+        "resize1920x1080": "1920×1080"
     },
     "ja": {
         "appTitle": "Gemini 透かし除去ツール & 自動リサイズ",
@@ -179,9 +179,9 @@ const translations = {
         "positionNew": "新しい余白 (192px/96px)",
         "positionOld": "古い余白 (64px/32px)",
         "resizeLabel": "自動リサイズ:",
-        "resizeOff": "オフ",
-        "resize1280x720": "1280×720 / 720×1280",
-        "resize1920x1080": "1920×1080 / 1080×1920"
+        "resizeOff": "끔",
+        "resize1280x720": "1280×720",
+        "resize1920x1080": "1920×1080"
     },
     "ko": {
         "appTitle": "Gemini 워터마크 제거기 & 자동 크기调整",
@@ -226,7 +226,7 @@ const translations = {
         "positionOld": "이전 마진 (64px/32px)",
         "resizeLabel": "자동 크기调整:",
         "resizeOff": "끔",
-        "resize1280x720": "1280×720 / 720×1280",
-        "resize1920x1080": "1920×1080 / 1080×1920"
+        "resize1280x720": "1280×720",
+        "resize1920x1080": "1920×1080"
     }
 };
