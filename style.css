@@ -569,6 +569,18 @@ body.has-files .app-card {
   }
 }
 
+/* Resize Toggle */
+.resize-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.resize-toggle input[type="checkbox"] {
+    width: auto;
+    height: auto;
+    cursor: pointer;
+}
+
 .drop-icon {
   width: 96px;
   height: 96px;

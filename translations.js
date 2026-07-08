@@ -39,7 +39,8 @@ const translations = {
         "autoLabel": "自動",
         "positionAuto": "自動偵測位置",
         "positionNew": "新版邊距 (192px/96px)",
-        "positionOld": "舊版邊距 (64px/32px)"
+        "positionOld": "舊版邊距 (64px/32px)",
+        "resizeLabel": "縮放 1280×720 / 720×1280"
     },
     "zh-CN": {
         "appTitle": "Gemini 水印去除器",
@@ -81,7 +82,8 @@ const translations = {
         "autoLabel": "自动",
         "positionAuto": "自动检测位置",
         "positionNew": "新版边距 (192px/96px)",
-        "positionOld": "旧版边距 (64px/32px)"
+        "positionOld": "旧版边距 (64px/32px)",
+        "resizeLabel": "缩放 1280×720 / 720×1280"
     },
     "en": {
         "appTitle": "Gemini Watermark Remover",
@@ -123,7 +125,8 @@ const translations = {
         "autoLabel": "Auto",
         "positionAuto": "Auto Position",
         "positionNew": "New Margin (192px/96px)",
-        "positionOld": "Old Margin (64px/32px)"
+        "positionOld": "Old Margin (64px/32px)",
+        "resizeLabel": "Resize 1280×720 / 720×1280"
     },
     "ja": {
         "appTitle": "Gemini 透かし除去ツール",
@@ -165,7 +168,8 @@ const translations = {
         "autoLabel": "自動",
         "positionAuto": "自動位置検出",
         "positionNew": "新しい余白 (192px/96px)",
-        "positionOld": "古い余白 (64px/32px)"
+        "positionOld": "古い余白 (64px/32px)",
+        "resizeLabel": "リサイズ 1280×720 / 720×1280"
     },
     "ko": {
         "appTitle": "Gemini 워터마크 제거기",
@@ -207,6 +211,7 @@ const translations = {
         "autoLabel": "자동",
         "positionAuto": "자동 위치 감지",
         "positionNew": "새 마진 (192px/96px)",
-        "positionOld": "이전 마진 (64px/32px)"
+        "positionOld": "이전 마진 (64px/32px)",
+        "resizeLabel": "크기 조정 1280×720 / 720×1280"
     }
 };

@@ -14,7 +14,8 @@ const STATE = {
         opacity: 0.8,    // 0.0 ~ 1.0 - Logo 透明度
         scale: 1.0       // 0.1 ~ 2.0 - Logo 縮放比例 (預設 1.0)
     },
-    downloadFormat: 'png' // 'png' or 'jpeg' - 全域下載格式設定
+    downloadFormat: 'png', // 'png' or 'jpeg' - 全域下載格式設定
+    resizeAfterProcess: false, // true = 啟用自動縮放（橫式 1280×720 / 直式 720×1280）
 };
 
 // Global DOM Elements
@@ -646,7 +647,28 @@ class ImageProcessor {
         const ext = format === 'jpeg' ? '.jpg' : '.png';
         const quality = format === 'jpeg' ? 0.85 : undefined; // JPEG 壓縮品質
 
-        this.elements.canvas.toBlob((blob) => {
+        // 新增：如果啟用 resize，強制縮放到目標尺寸
+        let outputCanvas = this.elements.canvas;
+        if (STATE.resizeAfterProcess) {
+            const w = outputCanvas.width;
+            const h = outputCanvas.height;
+            const isLandscape = w > h;
+
+            const targetW = isLandscape ? 1280 : 720;
+            const targetH = isLandscape ? 720 : 1280;
+
+            const resizedCanvas = document.createElement('canvas');
+            resizedCanvas.width = targetW;
+            resizedCanvas.height = targetH;
+            const ctx = resizedCanvas.getContext('2d');
+
+            // 強制拉伸繪製（不改變比例、不留黑邊）
+            ctx.drawImage(outputCanvas, 0, 0, targetW, targetH);
+
+            outputCanvas = resizedCanvas;
+        }
+
+        outputCanvas.toBlob((blob) => {
             if (!blob) return;
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -819,7 +841,26 @@ downloadAllBtn.addEventListener('click', async () => {
                 }
                 usedNames.add(filename);
 
-                p.elements.canvas.toBlob((blob) => {
+                // 個別圖片 resize 處理
+                let sourceCanvas = p.elements.canvas;
+                if (STATE.resizeAfterProcess) {
+                    const w = sourceCanvas.width;
+                    const h = sourceCanvas.height;
+                    const isLandscape = w > h;
+
+                    const targetW = isLandscape ? 1280 : 720;
+                    const targetH = isLandscape ? 720 : 1280;
+
+                    const resizedCanvas = document.createElement('canvas');
+                    resizedCanvas.width = targetW;
+                    resizedCanvas.height = targetH;
+                    const ctx = resizedCanvas.getContext('2d');
+                    ctx.drawImage(sourceCanvas, 0, 0, targetW, targetH);
+
+                    sourceCanvas = resizedCanvas;
+                }
+
+                sourceCanvas.toBlob((blob) => {
                     if (blob) {
                         folder.file(filename, blob);
                     }
@@ -854,6 +895,13 @@ const downloadFormatSelect = document.getElementById('downloadFormat');
 if (downloadFormatSelect) {
     downloadFormatSelect.addEventListener('change', (e) => {
         STATE.downloadFormat = e.target.value;
+    });
+}
+
+const resizeToggle = document.getElementById('resizeToggle');
+if (resizeToggle) {
+    resizeToggle.addEventListener('change', (e) => {
+        STATE.resizeAfterProcess = e.target.checked;
     });
 }
 
