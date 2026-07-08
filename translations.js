@@ -13,7 +13,7 @@ const translations = {
         "scaleLabel": "大小:",
         "dropPrompt": "<span class=\"font-medium text-indigo-400\">拖放多張圖片</span>、貼上 (Ctrl+V) 或點擊上傳",
         "dropSubtext": "支援 JPG, PNG, WEBP (可批次處理)",
-        "footerCredits": "凱文大叔製作",
+        "footerCredits": "Aflypen Studio",
         "footerLocal": "於您的瀏覽器本地運行。",
         "lightboxCaption": "長按顯示原圖",
         "lightboxPrev": "上一張",

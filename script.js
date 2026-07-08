@@ -672,11 +672,14 @@ class ImageProcessor {
             if (!blob) return;
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
-            // Construct filename
+            // Construct filename with orientation prefix
             const nameParts = this.file.name.split('.');
             nameParts.pop(); // remove extension
             const suffix = Localization.get('cleanSuffix') || '_clean';
-            link.download = `${nameParts.join('.')}${suffix}${ext}`;
+            const w = outputCanvas.width;
+            const h = outputCanvas.height;
+            const prefix = w > h ? 'R_' : 'S_';
+            link.download = `${prefix}${nameParts.join('.')}${suffix}${ext}`;
 
             link.href = url;
             link.click();
@@ -859,6 +862,12 @@ downloadAllBtn.addEventListener('click', async () => {
 
                     sourceCanvas = resizedCanvas;
                 }
+
+                // 根據最終尺寸決定方向前綴
+                const fw = sourceCanvas.width;
+                const fh = sourceCanvas.height;
+                const prefix = fw > fh ? 'R_' : 'S_';
+                filename = `${prefix}${filename}`;
 
                 sourceCanvas.toBlob((blob) => {
                     if (blob) {
