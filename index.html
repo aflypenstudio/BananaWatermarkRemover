@@ -52,7 +52,7 @@
             <h1 class="flex items-center justify-center gap-3">
                 <img src="assets/favicon.svg" alt="Gemini Watermark Remover Logo" width="48" height="48"
                     class="header-logo">
-                <span data-i18n="appTitle">Gemini 浮水印去除器</span>
+                <span data-i18n="appTitle">Gemini 浮水印去除器 & 自動縮小</span>
             </h1>
             <p class="subtitle" data-i18n="appSubtitle">使用逆向 Alpha 混合技術去除 Gemini 生成圖片中的可見浮水印。</p>
             <div class="features-list">
@@ -73,11 +73,13 @@
                         <option value="jpeg" data-i18n="formatJpeg">JPEG (壓縮)</option>
                     </select>
                 </div>
-                <div class="resize-toggle">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; color: var(--text-primary);">
-                        <input type="checkbox" id="resizeToggle" style="width: auto; height: auto; cursor: pointer;">
-                        <span data-i18n="resizeLabel">縮放 1280×720 / 720×1280</span>
-                    </label>
+                <div class="resize-selector">
+                    <label><span data-i18n="resizeLabel">自動縮小:</span></label>
+                    <select id="resizePreset">
+                        <option value="" data-i18n="resizeOff">關閉</option>
+                        <option value="1280x720" data-i18n="resize1280x720">1280×720 / 720×1280</option>
+                        <option value="1920x1080" data-i18n="resize1920x1080">1920×1080 / 1080×1920</option>
+                    </select>
                 </div>
                 <button id="downloadAllBtn" class="btn btn-primary">
                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

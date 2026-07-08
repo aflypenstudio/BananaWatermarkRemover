@@ -1,6 +1,6 @@
 const translations = {
     "zh-TW": {
-        "appTitle": "Gemini 浮水印去除器",
+        "appTitle": "Gemini 浮水印去除器 & 自動縮小",
         "appSubtitle": "使用逆向 Alpha 混合技術去除 Gemini 生成圖片中的可見浮水印。",
         "featureFree": "✨ 免費快速",
         "featureLocal": "💻 不佔資源",
@@ -40,10 +40,13 @@ const translations = {
         "positionAuto": "自動偵測位置",
         "positionNew": "新版邊距 (192px/96px)",
         "positionOld": "舊版邊距 (64px/32px)",
-        "resizeLabel": "縮放 1280×720 / 720×1280"
+        "resizeLabel": "自動縮小:",
+        "resizeOff": "關閉",
+        "resize1280x720": "1280×720 / 720×1280",
+        "resize1920x1080": "1920×1080 / 1080×1920"
     },
     "zh-CN": {
-        "appTitle": "Gemini 水印去除器",
+        "appTitle": "Gemini 水印去除器 & 自动缩小",
         "appSubtitle": "使用逆向 Alpha 混合技术去除 Gemini 生成图片中的可见水印。",
         "featureFree": "✨ 免费快速",
         "featureLocal": "💻 不占资源",
@@ -83,10 +86,13 @@ const translations = {
         "positionAuto": "自动检测位置",
         "positionNew": "新版边距 (192px/96px)",
         "positionOld": "旧版边距 (64px/32px)",
-        "resizeLabel": "缩放 1280×720 / 720×1280"
+        "resizeLabel": "自动缩小:",
+        "resizeOff": "关闭",
+        "resize1280x720": "1280×720 / 720×1280",
+        "resize1920x1080": "1920×1080 / 1080×1920"
     },
     "en": {
-        "appTitle": "Gemini Watermark Remover",
+        "appTitle": "Gemini Watermark Remover & Auto Resize",
         "appSubtitle": "Remove visible watermarks from Gemini-generated images using reverse Alpha blending.",
         "featureFree": "✨ Free & Fast",
         "featureLocal": "💻 Client-side Processing",
@@ -126,10 +132,13 @@ const translations = {
         "positionAuto": "Auto Position",
         "positionNew": "New Margin (192px/96px)",
         "positionOld": "Old Margin (64px/32px)",
-        "resizeLabel": "Resize 1280×720 / 720×1280"
+        "resizeLabel": "Auto Resize:",
+        "resizeOff": "Off",
+        "resize1280x720": "1280×720 / 720×1280",
+        "resize1920x1080": "1920×1080 / 1080×1920"
     },
     "ja": {
-        "appTitle": "Gemini 透かし除去ツール",
+        "appTitle": "Gemini 透かし除去ツール & 自動リサイズ",
         "appSubtitle": "逆アルファブレンド技術を使用して、Gemini生成画像から透かしを除去します。",
         "featureFree": "✨ 無料＆高速",
         "featureLocal": "💻 ローカル処理",
@@ -169,10 +178,13 @@ const translations = {
         "positionAuto": "自動位置検出",
         "positionNew": "新しい余白 (192px/96px)",
         "positionOld": "古い余白 (64px/32px)",
-        "resizeLabel": "リサイズ 1280×720 / 720×1280"
+        "resizeLabel": "自動リサイズ:",
+        "resizeOff": "オフ",
+        "resize1280x720": "1280×720 / 720×1280",
+        "resize1920x1080": "1920×1080 / 1080×1920"
     },
     "ko": {
-        "appTitle": "Gemini 워터마크 제거기",
+        "appTitle": "Gemini 워터마크 제거기 & 자동 크기调整",
         "appSubtitle": "역 알파 블렌딩 기술을 사용하여 Gemini 생성 이미지에서 워터마크를 제거합니다.",
         "featureFree": "✨ 무료 & 빠른 속도",
         "featureLocal": "💻 로컬 처리",
@@ -212,6 +224,9 @@ const translations = {
         "positionAuto": "자동 위치 감지",
         "positionNew": "새 마진 (192px/96px)",
         "positionOld": "이전 마진 (64px/32px)",
-        "resizeLabel": "크기 조정 1280×720 / 720×1280"
+        "resizeLabel": "자동 크기调整:",
+        "resizeOff": "끔",
+        "resize1280x720": "1280×720 / 720×1280",
+        "resize1920x1080": "1920×1080 / 1080×1920"
     }
 };

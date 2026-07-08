@@ -15,7 +15,7 @@ const STATE = {
         scale: 1.0       // 0.1 ~ 2.0 - Logo 縮放比例 (預設 1.0)
     },
     downloadFormat: 'png', // 'png' or 'jpeg' - 全域下載格式設定
-    resizeAfterProcess: false, // true = 啟用自動縮放（橫式 1280×720 / 直式 720×1280）
+    resizePreset: '', // '' | '1280x720' | '1920x1080' - 自動縮小預設尺寸
 };
 
 // Global DOM Elements
@@ -647,22 +647,27 @@ class ImageProcessor {
         const ext = format === 'jpeg' ? '.jpg' : '.png';
         const quality = format === 'jpeg' ? 0.85 : undefined; // JPEG 壓縮品質
 
-        // 新增：如果啟用 resize，強制縮放到目標尺寸
+        // 如果啟用自動縮小，強制縮放到目標尺寸
         let outputCanvas = this.elements.canvas;
-        if (STATE.resizeAfterProcess) {
-            const w = outputCanvas.width;
-            const h = outputCanvas.height;
-            const isLandscape = w > h;
+        const preset = STATE.resizePreset;
+        if (preset) {
+            const isLandscape = outputCanvas.width > outputCanvas.height;
+            let targetW, targetH;
 
-            const targetW = isLandscape ? 1280 : 720;
-            const targetH = isLandscape ? 720 : 1280;
+            if (preset === '1920x1080') {
+                targetW = isLandscape ? 1920 : 1080;
+                targetH = isLandscape ? 1080 : 1920;
+            } else { // '1280x720'
+                targetW = isLandscape ? 1280 : 720;
+                targetH = isLandscape ? 720 : 1280;
+            }
 
             const resizedCanvas = document.createElement('canvas');
             resizedCanvas.width = targetW;
             resizedCanvas.height = targetH;
             const ctx = resizedCanvas.getContext('2d');
 
-            // 強制拉伸繪製（不改變比例、不留黑邊）
+            // 強制拉伸繪製
             ctx.drawImage(outputCanvas, 0, 0, targetW, targetH);
 
             outputCanvas = resizedCanvas;
@@ -846,13 +851,18 @@ downloadAllBtn.addEventListener('click', async () => {
 
                 // 個別圖片 resize 處理
                 let sourceCanvas = p.elements.canvas;
-                if (STATE.resizeAfterProcess) {
-                    const w = sourceCanvas.width;
-                    const h = sourceCanvas.height;
-                    const isLandscape = w > h;
+                const preset = STATE.resizePreset;
+                if (preset) {
+                    const isLandscape = sourceCanvas.width > sourceCanvas.height;
+                    let targetW, targetH;
 
-                    const targetW = isLandscape ? 1280 : 720;
-                    const targetH = isLandscape ? 720 : 1280;
+                    if (preset === '1920x1080') {
+                        targetW = isLandscape ? 1920 : 1080;
+                        targetH = isLandscape ? 1080 : 1920;
+                    } else { // '1280x720'
+                        targetW = isLandscape ? 1280 : 720;
+                        targetH = isLandscape ? 720 : 1280;
+                    }
 
                     const resizedCanvas = document.createElement('canvas');
                     resizedCanvas.width = targetW;
@@ -907,10 +917,10 @@ if (downloadFormatSelect) {
     });
 }
 
-const resizeToggle = document.getElementById('resizeToggle');
-if (resizeToggle) {
-    resizeToggle.addEventListener('change', (e) => {
-        STATE.resizeAfterProcess = e.target.checked;
+const resizePresetSelect = document.getElementById('resizePreset');
+if (resizePresetSelect) {
+    resizePresetSelect.addEventListener('change', (e) => {
+        STATE.resizePreset = e.target.value;
     });
 }
 
