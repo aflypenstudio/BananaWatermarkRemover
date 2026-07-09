@@ -1154,6 +1154,7 @@ function updateUIState() {
 }
 
 // Drag & Drop - on dropZone
+// NOTE: dropZone click is handled by <label> in HTML (no JS needed)
 dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1162,7 +1163,6 @@ dropZone.addEventListener('dragover', (e) => {
 });
 
 dropZone.addEventListener('dragleave', (e) => {
-    // Only remove if we're actually leaving the dropZone (not entering a child)
     if (!dropZone.contains(e.relatedTarget)) {
         dropZone.classList.remove('drag-over');
     }
@@ -1172,20 +1172,10 @@ dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
     e.stopPropagation();
     dropZone.classList.remove('drag-over');
-    const files = e.dataTransfer ? e.dataTransfer.files : null;
-    if (files && files.length > 0) {
-        handleFiles(files);
+    if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+        handleFiles(e.dataTransfer.files);
     }
     return false;
-});
-
-
-
-dropZone.addEventListener('click', (e) => {
-    // 點擊圖片卡片時不觸發上傳（保留卡片內的操作功能）
-    // 但點擊 results-container 的空白區域時仍可上傳新圖片
-    if (e.target.closest('.image-card')) return;
-    fileInput.click();
 });
 
 fileInput.addEventListener('change', (e) => {

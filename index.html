@@ -240,7 +240,10 @@
                     </p>
                 </div>
 
-                <input type="file" id="fileInput" class="hidden" accept="image/*" multiple>
+                <!-- label 包裹：點擊整個 dropZone 都會觸發檔案對話框 -->
+                <label for="fileInput" style="display:contents; cursor:pointer;">
+                    <input type="file" id="fileInput" class="hidden" accept="image/*" multiple>
+                </label>
             </div>
         </div>
     </div>
