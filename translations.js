@@ -1,6 +1,6 @@
 const translations = {
     "zh-TW": {
-        "appTitle": "Gemini 浮水印去除器 & 自動縮小",
+        "appTitle": "巴娜娜水印&微調器",
         "appSubtitle": "使用逆向 Alpha 混合技術去除 Gemini 生成圖片中的可見浮水印。",
         "featureFree": "✨ 免費快速",
         "featureLocal": "💻 不佔資源",
@@ -35,7 +35,7 @@ const translations = {
         "formatLabel": "格式:",
         "formatPng": "PNG (無損)",
         "formatJpeg": "JPEG (壓縮)",
-        "zipFolderName": "gemini_去除浮水印",
+        "zipFolderName": "banana_clean",
         "autoLabel": "自動",
         "positionAuto": "自動偵測位置",
         "positionNew": "新版邊距 (192px/96px)",
@@ -54,7 +54,8 @@ const translations = {
         "sharpenLabel": "銳化",
         "fileNameTemplate": "檔名範本:",
         "fileNamePrefix": "前綴:",
-                "optionsTitle": "輸出選項"
+        "noLogoOption": "無 Logo 版本",
+        "optionsTitle": "輸出選項"
     },
     "zh-CN": {
         "appTitle": "Gemini 水印去除器 & 自动缩小",
@@ -111,7 +112,8 @@ const translations = {
         "sharpenLabel": "锐化",
         "fileNameTemplate": "档名模板:",
         "fileNamePrefix": "前缀:",
-                "optionsTitle": "输出选项"
+        "noLogoOption": "无 Logo 版本",
+        "optionsTitle": "输出选项"
     },
     "en": {
         "appTitle": "Gemini Watermark Remover & Auto Resize",
@@ -168,6 +170,7 @@ const translations = {
         "sharpenLabel": "Sharpen",
         "fileNameTemplate": "Filename:",
         "fileNamePrefix": "Prefix:",
+        "noLogoOption": "No Logo Version",
         "optionsTitle": "Output Options"
     },
     "ja": {
@@ -225,6 +228,7 @@ const translations = {
         "sharpenLabel": "シャープ化",
         "fileNameTemplate": "ファイル名:",
         "fileNamePrefix": "接頭辞:",
+        "noLogoOption": "ロゴなしバージョン",
         "optionsTitle": "出力オプション"
     },
     "ko": {
@@ -282,6 +286,7 @@ const translations = {
         "sharpenLabel": "선명화",
         "fileNameTemplate": "파일명:",
         "fileNamePrefix": "접두사:",
+        "noLogoOption": "로고 없음 버전",
         "optionsTitle": "출력 옵션"
     }
 };

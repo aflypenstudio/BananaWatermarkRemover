@@ -515,11 +515,17 @@ class ImageProcessor {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
-                    <button class="btn btn-primary download-btn" disabled style="border-radius: 0.5rem; padding: 0.5rem; flex: 1;">
+                    <div class="download-with-type" style="display: flex; flex: 1; gap: 0; align-items: center;">
+                        <label class="no-logo-check" style="display: flex; align-items: center; gap: 4px; font-size: 0.7rem; padding: 0 6px; color: var(--text-secondary); white-space: nowrap;">
+                            <input type="checkbox" class="download-no-logo-check" title="${Localization.get('noLogoOption') || '無 Logo 版本'}">
+                            N
+                        </label>
+                        <button class="btn btn-primary download-btn" disabled style="border-radius: 0 0.5rem 0.5rem 0; padding: 0.5rem; flex: 1;">
                             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                             </svg>
                         </button>
+                    </div>
                 </div>
                 </div>
             </div>
@@ -539,7 +545,8 @@ class ImageProcessor {
         this.elements.alphaValue = card.querySelector('.alpha-value');
         this.elements.autoStrengthCheck = card.querySelector('.auto-strength-check');
         this.elements.downloadBtn = card.querySelector('.download-btn');
-                this.elements.removeBtn = card.querySelector('.remove-btn');
+        this.elements.noLogoCheck = card.querySelector('.download-no-logo-check');
+        this.elements.removeBtn = card.querySelector('.remove-btn');
         this.elements.compareBtn = card.querySelector('.compare-btn');
         this.elements.wrapper = card.querySelector('.image-wrapper');
         this.elements.compareOverlay = card.querySelector('.comparison-overlay'); // Added ref
@@ -577,7 +584,9 @@ class ImageProcessor {
         });
 
         this.elements.downloadBtn.addEventListener('click', () => {
-            this.download();
+            const noLogoCheck = this.elements.noLogoCheck;
+            const noLogo = noLogoCheck && noLogoCheck.checked;
+            this.download(noLogo);
         });
         this.elements.removeBtn.addEventListener('click', () => this.destroy());
 
@@ -842,8 +851,9 @@ class ImageProcessor {
 
     /**
      * 下載圖片
+     * @param {boolean} noLogo - 是否為無 Logo 版本
      */
-    download() {
+    download(noLogo = false) {
         const imageData = this.getImageForDownload();
         if (!imageData) return;
 
@@ -907,9 +917,14 @@ class ImageProcessor {
             // 優先從 DOM 讀取，確保獲取最新值
             const userPrefix = (filenamePrefixInput ? filenamePrefixInput.value : STATE.filenamePrefix) || '';
 
-            // 方向前綴：横R / 豎S
+            // 方向前綴：横R / 豎S / 無Logo N
             const w = outputCanvas.width;
-            const dirPrefix = w > outputCanvas.height ? 'R_' : 'S_';
+            let dirPrefix;
+            if (noLogo) {
+                dirPrefix = 'N_'; // 無 Logo 版本
+            } else {
+                dirPrefix = w > outputCanvas.height ? 'R_' : 'S_';
+            }
             link.download = `${userPrefix}${dirPrefix}${nameParts.join('.')}${suffix}${ext}`;
 
             link.href = url;
@@ -1153,7 +1168,7 @@ async function downloadAll() {
         const content = await zip.generateAsync({ type: 'blob' });
         const url = URL.createObjectURL(content);
         const link = document.createElement('a');
-        link.download = `banana_watermark_remover_${Date.now()}.zip`;
+        link.download = `banana_watermark_remover.zip`;
         link.href = url;
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
