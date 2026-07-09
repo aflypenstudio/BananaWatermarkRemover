@@ -1,6 +1,6 @@
 const translations = {
     "zh-TW": {
-        "appTitle": "巴娜娜水印&微調器",
+        "appTitle": "巴娜娜去水印&微調器",
         "appSubtitle": "使用逆向 Alpha 混合技術去除 Gemini 生成圖片中的可見浮水印。",
         "downloadAll": "全部下載 (ZIP)",
         "logoTitle": "🎨 自訂 Logo（選填）",

@@ -1,4 +1,4 @@
-# 巴娜娜水印&微調器
+# 巴娜娜去水印&微調器
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

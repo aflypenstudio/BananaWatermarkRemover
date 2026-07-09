@@ -5,7 +5,7 @@
 ## [0.5] - 2026-07-09
 
 ### 🎉 新功能
-- **專案更名**：專案正式更名為「巴娜娜水印&微調器」(Banana Watermark Remover & Adjuster)
+- **專案更名**：專案正式更名為「巴娜娜去水印&微調器」(Banana Watermark Remover & Adjuster)
 - **ZIP 檔案命名更新**：批次下載 ZIP 檔名更新為 `banana_watermark_remover.zip`
 - **資料夾路徑更新**：ZIP 內的路徑更新為 `banana_clean`
 - **N_ 版本下載**：批次下載時，若有上傳 Logo，則同時產生 R_/S_（含 Logo）和 N_（無 Logo）兩種版本
