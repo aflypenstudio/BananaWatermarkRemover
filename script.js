@@ -795,9 +795,10 @@ class ImageProcessor {
     }
 
     /**
-     * 疊加自訂 Logo 到指定 canvas 右下角
+     * 疊加自訂 Logo 到指定 canvas 的水印位置
      * Logo 會自動縮放以配合 canvas 比例，並套用透明度
      * 大小基於 canvas 寬度的 3%~15%（scale 10%~300% 對應此範圍）
+     * 位置跟随水印区域（用于掩盖去水印后的痕迹）
      */
     applyCustomLogoToCanvas(targetCanvas) {
         if (!STATE.customLogo.image) return;
@@ -811,14 +812,9 @@ class ImageProcessor {
         const userScale = STATE.customLogo.scale; // 0.1 ~ 3.0
 
         // 基於目標 canvas 寬度計算 Logo 大小
-        // scale 10%  → canvas 寬度 3%
-        // scale 100% → canvas 寬度 5%
-        // scale 300% → canvas 寬度 15%
-        const minPercent = 0.03;  // 最低 3% 圖寬
-        const maxPercent = 0.15;  // 最高 15% 圖寬
+        const minPercent = 0.03;
+        const maxPercent = 0.15;
         const percentRange = maxPercent - minPercent;
-
-        // 將 scale 0.1~3.0 映射到 minPercent~maxPercent
         const logoPercent = minPercent + percentRange * ((userScale - 0.1) / 2.9);
         const targetSize = w * logoPercent;
 
@@ -827,12 +823,28 @@ class ImageProcessor {
         const scaledWidth = logo.width * scale;
         const scaledHeight = logo.height * scale;
 
-        // 計算位置（右下角，間距為 canvas 寬的 2%）
-        const margin = w * 0.02;
-        const posX = w - margin - scaledWidth;
-        const posY = h - margin - scaledHeight;
+        // 計算位置：跟随水印区域
+        let posX, posY;
+        const watermarkRegion = this.state.watermarkRegion;
 
-        if (posX < 0 || posY < 0) return;
+        if (watermarkRegion && watermarkRegion.x !== undefined) {
+            // 使用水印位置，並考慮縮放比例
+            const originalW = this.state.originalImage ? this.state.originalImage.width : this.state.cleanImageData.width;
+            const originalH = this.state.originalImage ? this.state.originalImage.height : this.state.cleanImageData.height;
+            const scaleX = w / originalW;
+            const scaleY = h / originalH;
+
+            // LOGO 放在水印区域的起始位置（会覆盖水印区域）
+            posX = watermarkRegion.x * scaleX;
+            posY = watermarkRegion.y * scaleY;
+        } else {
+            // 備用：放在右下角
+            const margin = w * 0.02;
+            posX = w - margin - scaledWidth;
+            posY = h - margin - scaledHeight;
+        }
+
+        if (posX < 0 || posY < 0 || posX + scaledWidth > w || posY + scaledHeight > h) return;
 
         // 繪製 Logo
         ctx.save();
@@ -842,9 +854,10 @@ class ImageProcessor {
     }
 
     /**
-     * 疊加自訂 Logo 到圖片右下角（舊方法，用於 UI 預覽）
+     * 疊加自訂 Logo 到圖片的水印位置（用於 UI 預覽）
      * Logo 會自動縮放以配合圖片比例，並套用透明度
-     * 大小基於原圖寬度的 3%~15%（scale 10%~300% 對應此範圍）
+     * 大小基於圖片寬度的 3%~15%（scale 10%~300% 對應此範圍）
+     * 位置跟随水印区域（用于掩盖去水印后的痕迹）
      */
     applyCustomLogo() {
         if (!STATE.customLogo.image) return;
@@ -858,15 +871,10 @@ class ImageProcessor {
         const h = canvas.height;
         const userScale = STATE.customLogo.scale; // 0.1 ~ 3.0
 
-        // 基於原圖寬度計算 Logo 大小
-        // scale 10%  → 原圖寬度 3%
-        // scale 100% → 原圖寬度 5%
-        // scale 300% → 原圖寬度 15%
-        const minPercent = 0.03;  // 最低 3% 圖寬
-        const maxPercent = 0.15;  // 最高 15% 圖寬
+        // 基於圖片寬度計算 Logo 大小
+        const minPercent = 0.03;
+        const maxPercent = 0.15;
         const percentRange = maxPercent - minPercent;
-
-        // 將 scale 0.1~3.0 映射到 minPercent~maxPercent
         const logoPercent = minPercent + percentRange * ((userScale - 0.1) / 2.9);
         const targetSize = w * logoPercent;
 
@@ -875,12 +883,22 @@ class ImageProcessor {
         const scaledWidth = logo.width * scale;
         const scaledHeight = logo.height * scale;
 
-        // 計算位置（右下角，間距為圖寬的 2%）
-        const margin = w * 0.02;
-        const posX = w - margin - scaledWidth;
-        const posY = h - margin - scaledHeight;
+        // 計算位置：跟随水印区域
+        let posX, posY;
+        const watermarkRegion = this.state.watermarkRegion;
 
-        if (posX < 0 || posY < 0) return;
+        if (watermarkRegion && watermarkRegion.x !== undefined) {
+            // 使用水印位置
+            posX = watermarkRegion.x;
+            posY = watermarkRegion.y;
+        } else {
+            // 備用：放在右下角
+            const margin = w * 0.02;
+            posX = w - margin - scaledWidth;
+            posY = h - margin - scaledHeight;
+        }
+
+        if (posX < 0 || posY < 0 || posX + scaledWidth > w || posY + scaledHeight > h) return;
 
         // 繪製 Logo
         ctx.save();
