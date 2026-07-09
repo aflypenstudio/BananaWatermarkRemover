@@ -496,6 +496,11 @@ class ImageProcessor {
                             <span style="display: flex; align-items: center; gap: 0.25rem;">
                                 <input type="checkbox" class="auto-strength-check" checked style="margin: 0; cursor: pointer; width: auto; height: auto;">
                                 <span data-i18n="autoLabel" style="font-size: 0.85rem; opacity: 0.9;">${Localization.get('autoLabel')}</span>
+                                <button class="btn btn-small auto-detect-btn" title="${Localization.get('autoDetectTitle') || '重新偵測'}" style="padding: 2px 6px; font-size: 0.75rem; min-width: unset; border-radius: 4px; background: var(--btn-secondary);">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </button>
                                 <span class="alpha-value" style="font-weight: 600; min-width: 2rem; text-align: right;">Auto</span>
                             </span>
                         </label>
@@ -544,6 +549,7 @@ class ImageProcessor {
         this.elements.alphaInput = card.querySelector('input[type="range"]');
         this.elements.alphaValue = card.querySelector('.alpha-value');
         this.elements.autoStrengthCheck = card.querySelector('.auto-strength-check');
+        this.elements.autoDetectBtn = card.querySelector('.auto-detect-btn');
         this.elements.downloadBtn = card.querySelector('.download-btn');
         this.elements.noLogoCheck = card.querySelector('.download-no-logo-check');
         this.elements.removeBtn = card.querySelector('.remove-btn');
@@ -573,6 +579,18 @@ class ImageProcessor {
                 this.config.alphaGain = val;
                 this.elements.alphaValue.textContent = val.toFixed(2);
             }
+            this.processAndRender();
+        });
+
+        // 重新觸發自動強度偵測
+        this.elements.autoDetectBtn.addEventListener('click', () => {
+            // 強制標記為需要自動偵測
+            this.config.autoStrength = true;
+            this.elements.autoStrengthCheck.checked = true;
+            this.elements.alphaInput.disabled = true;
+            this.elements.alphaValue.textContent = '...';
+
+            // 重新處理（會觸發 estimateOptimalGain）
             this.processAndRender();
         });
 
