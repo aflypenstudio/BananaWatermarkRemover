@@ -499,7 +499,7 @@ class ImageProcessor {
                                 <span class="alpha-value" style="font-weight: 600; min-width: 2rem; text-align: right;">Auto</span>
                             </span>
                         </label>
-                        <input type="range" min="0.1" max="3.0" step="0.1" value="0.5" disabled>
+                        <input type="range" min="0.05" max="2.0" step="0.05" value="0.50" disabled>
                     </div>
                 </div>
 

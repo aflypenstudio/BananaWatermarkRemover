@@ -329,19 +329,38 @@ function estimateOptimalGain(imageData, mask, posX, posY) {
         }
     }
 
+    // 兩階段搜尋策略：第一階段粗搜（0.1 間隔），第二階段細調（0.025 間隔）
     let bestGain = 0.5;
     let bestScore = Number.NEGATIVE_INFINITY;
 
-    // 搜尋每個候選 gain
-    for (let g = GAIN_MIN; g <= GAIN_MAX; g += GAIN_STEP) {
+    // 第一階段：粗搜 0.1 間隔
+    const roughScores = [];
+    for (let g = GAIN_MIN; g <= GAIN_MAX; g += 0.1) {
         const scores = assessGain(imageData, mask, posX, posY, g, validPositions, edgeInfo, backgroundPixels, w, h);
-        const totalScore = scores.uniformity + scores.edgeBlend * 1.5 + scores.peak * 0.5;
-
+        // 統一性權重提高到 2.0，因為這是最重要的指標
+        const totalScore = scores.uniformity * 2.0 + scores.edgeBlend * 1.0 + scores.peak * 0.3;
+        roughScores.push({ gain: g, score: totalScore });
         if (totalScore > bestScore) {
             bestScore = totalScore;
             bestGain = g;
         }
     }
+
+    // 第二階段：在最佳粗搜點周圍細調（±0.2 範圍）
+    const fineStart = Math.max(GAIN_MIN, bestGain - 0.2);
+    const fineEnd = Math.min(GAIN_MAX, bestGain + 0.2);
+    for (let g = fineStart; g <= fineEnd; g += 0.025) {
+        const scores = assessGain(imageData, mask, posX, posY, g, validPositions, edgeInfo, backgroundPixels, w, h);
+        const totalScore = scores.uniformity * 2.0 + scores.edgeBlend * 1.0 + scores.peak * 0.3;
+        if (totalScore > bestScore) {
+            bestScore = totalScore;
+            bestGain = g;
+        }
+    }
+
+    // 確保回傳值在合理範圍內（0.1 ~ 1.5，常見的水印增益值）
+    if (bestGain < 0.1) bestGain = 0.1;
+    if (bestGain > 1.5) bestGain = 1.5;
 
     return parseFloat(bestGain.toFixed(2));
 }
@@ -397,9 +416,10 @@ function assessGain(imageData, mask, posX, posY, gain, validPositions, edgeInfo,
         // 轉換為評分：CV 越小分數越高
         const cv = stdDev / (mean + 0.001);
 
-        // 使用 Sigmoid 函數轉換：理想 CV 應該很小（< 0.1）
-        // 轉換後的分數範圍是 0 ~ 1
-        uniformityScore = 1 / (1 + Math.exp((cv - 0.05) * 20));
+        // 使用 Sigmoid 函數轉換：理想 CV 應該越小越好
+        // 調整閾值到 0.15，對常見的水印更寬容
+        // CV < 0.15 = 高分，CV > 0.15 = 分數快速下降
+        uniformityScore = 1 / (1 + Math.exp((cv - 0.15) * 15));
     }
 
     // 2. 評估邊緣融合度（處理後的邊緣亮度應該與背景接近）
