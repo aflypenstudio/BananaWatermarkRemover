@@ -12,10 +12,16 @@ const STATE = {
     customLogo: {
         image: null,     // HTMLImageElement - 使用者上傳的 Logo 圖片
         opacity: 0.8,    // 0.0 ~ 1.0 - Logo 透明度
-        scale: 1.0       // 0.1 ~ 2.0 - Logo 縮放比例 (預設 1.0)
+        scale: 1.0       // 0.1 ~ 3.0 - Logo 縮放比例 (預設 1.0)
     },
     downloadFormat: 'png', // 'png' or 'jpeg' - 全域下載格式設定
     resizePreset: '1280x720', // '' | '1280x720' | '1920x1080' - 自動縮小預設尺寸
+    keepExif: true, // 保留 EXIF
+    enableSharpen: false, // 銳化
+    filenamePrefix: 'R_', // 檔名前綴
+    sortBy: 'name', // 'name' | 'date'
+    sortOrder: 'asc', // 'asc' | 'desc'
+    exifData: new Map() // 儲存每張圖片的 EXIF 資料
 };
 
 // Global DOM Elements
@@ -24,6 +30,175 @@ const fileInput = document.getElementById('fileInput');
 const resultsContainer = document.getElementById('resultsContainer');
 const globalActions = document.getElementById('globalActions');
 const downloadAllBtn = document.getElementById('downloadAllBtn');
+const downloadCleanBtn = document.getElementById('downloadCleanBtn');
+const batchProgress = document.getElementById('batchProgress');
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
+
+// New Option Elements
+const keepExifCheckbox = document.getElementById('keepExif');
+const enableSharpenCheckbox = document.getElementById('enableSharpen');
+const filenamePrefixInput = document.getElementById('filenamePrefix');
+const sortBySelect = document.getElementById('sortBy');
+const sortOrderSelect = document.getElementById('sortOrder');
+const applySortBtn = document.getElementById('applySortBtn');
+
+// =============================================================================
+// EXIF Handler
+// =============================================================================
+
+/**
+ * 從 ArrayBuffer 中提取 JPEG EXIF 資料
+ */
+function extractExifFromBuffer(buffer) {
+    const view = new DataView(buffer);
+    if (view.getUint16(0) !== 0xFFD8) return null; // 不是 JPEG
+
+    let offset = 2;
+    while (offset < view.byteLength) {
+        const marker = view.getUint16(offset);
+        if (marker === 0xFFE1) { // APP1 (EXIF)
+            const length = view.getUint16(offset + 2);
+            const exifData = buffer.slice(offset, offset + 2 + length);
+            return new Uint8Array(exifData);
+        }
+        if (marker === 0xFFD9) break; // EOI
+        const length = view.getUint16(offset + 2);
+        offset += 2 + length;
+    }
+    return null;
+}
+
+/**
+ * 將 EXIF 資料寫入 Blob
+ */
+function writeExifToBlob(canvas, exifData, mimeType) {
+    return new Promise((resolve) => {
+        if (!exifData) {
+            canvas.toBlob(resolve, mimeType);
+            return;
+        }
+
+        canvas.toBlob((blob) => {
+            if (!blob || mimeType !== 'image/jpeg') {
+                resolve(blob);
+                return;
+            }
+
+            // 讀取 canvas blob 和 exif data，合併
+            Promise.all([
+                blob.arrayBuffer(),
+                Promise.resolve(exifData.buffer.slice(exifData.byteOffset, exifData.byteOffset + exifData.byteLength))
+            ]).then(([imgBuf, exifBuf]) => {
+                // 構建新的 JPEG：SOI + EXIF + 圖像數據 + EOI
+                const imgView = new DataView(imgBuf);
+                const exifView = new DataView(exifBuf);
+
+                // 找到原圖的 SOF0 (0xFFC0) 和之後的數據，提取壓縮數據
+                let sosStart = -1, sosEnd = -1;
+                let i = 0;
+                while (i < imgView.byteLength - 1) {
+                    if (imgView.getUint8(i) === 0xFF && imgView.getUint8(i + 1) === 0xDA) {
+                        sosStart = i;
+                        i += 2;
+                        // 跳過 SOS 參數
+                        let len = imgView.getUint16(i);
+                        i += 2 + len;
+                        // 找到 SOS 結尾 (0xFF 0xD9)
+                        while (i < imgView.byteLength - 1) {
+                            if (imgView.getUint8(i) === 0xFF && imgView.getUint8(i + 1) === 0xD9) {
+                                sosEnd = i + 2;
+                                break;
+                            }
+                            i++;
+                        }
+                        break;
+                    }
+                    i++;
+                }
+
+                if (sosStart === -1 || sosEnd === -1) {
+                    resolve(blob);
+                    return;
+                }
+
+                // 新 JPEG：SOI(2) + EXIF + SOS前數據 + SOS數據 + EOI(2)
+                const result = new ArrayBuffer(2 + exifData.byteLength + sosStart + (sosEnd - sosStart - 2) + 2);
+                const resultView = new Uint8Array(result);
+
+                // 寫入 SOI
+                resultView[0] = 0xFF; resultView[1] = 0xD8;
+                // 寫入 EXIF
+                resultView.set(exifData, 2);
+                // 寫入 SOS 前數據（到 SOS 標記前）
+                const imgBytes = new Uint8Array(imgBuf);
+                resultView.set(imgBytes.subarray(2, sosStart), 2 + exifData.byteLength);
+                // 寫入 SOS 數據（從 SOS 参数长度後開始到 EOI 前）
+                const sosDataStart = sosStart + 4 + imgView.getUint16(sosStart + 2);
+                resultView.set(imgBytes.subarray(sosDataStart, sosEnd), 2 + exifData.byteLength + sosStart);
+                // 寫入 EOI
+                const eoiPos = 2 + exifData.byteLength + sosStart + (sosEnd - sosDataStart);
+                resultView[eoiPos] = 0xFF; resultView[eoiPos + 1] = 0xD9;
+
+                resolve(new Blob([result], { type: 'image/jpeg' }));
+            });
+        }, mimeType);
+    });
+}
+
+/**
+ * 銳化滤镜 (Unsharp Mask)
+ */
+function applySharpen(canvas, ctx) {
+    const width = canvas.width;
+    const height = canvas.height;
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+    const strength = 0.5;
+
+    // 創建輸出陣列
+    const output = new Uint8ClampedArray(data.length);
+
+    // 3x3 卷積核 (銳化)
+    const kernel = [
+        0, -1, 0,
+        -1, 5, -1,
+        0, -1, 0
+    ];
+
+    for (let y = 1; y < height - 1; y++) {
+        for (let x = 1; x < width - 1; x++) {
+            for (let c = 0; c < 3; c++) {
+                let sum = 0;
+                for (let ky = -1; ky <= 1; ky++) {
+                    for (let kx = -1; kx <= 1; kx++) {
+                        const idx = ((y + ky) * width + (x + kx)) * 4 + c;
+                        sum += data[idx] * kernel[(ky + 1) * 3 + (kx + 1)];
+                    }
+                }
+                const origIdx = (y * width + x) * 4 + c;
+                const sharpened = data[origIdx] + (sum - data[origIdx]) * strength;
+                output[origIdx] = Math.max(0, Math.min(255, sharpened));
+            }
+            output[(y * width + x) * 4 + 3] = data[(y * width + x) * 4 + 3]; // Alpha
+        }
+    }
+
+    // 邊緣不處理
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            if (y === 0 || y === height - 1 || x === 0 || x === width - 1) {
+                const idx = (y * width + x) * 4;
+                output[idx] = data[idx];
+                output[idx + 1] = data[idx + 1];
+                output[idx + 2] = data[idx + 2];
+                output[idx + 3] = data[idx + 3];
+            }
+        }
+    }
+
+    return new ImageData(output, width, height);
+}
 
 // Logo 相關 DOM 元素
 const logoInput = document.getElementById('logoInput');
@@ -402,7 +577,7 @@ class ImageProcessor {
             this.processAndRender();
         });
 
-        this.elements.downloadBtn.addEventListener('click', () => this.download());
+        this.elements.downloadBtn.addEventListener('click', () => this.download(false));
         this.elements.removeBtn.addEventListener('click', () => this.destroy());
 
         // Comparison interactions
@@ -525,16 +700,26 @@ class ImageProcessor {
 
     loadImage() {
         if (!this.file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                this.state.originalImage = img;
-                this.processAndRender();
+
+        // 保存原始文件以提取 EXIF
+        this.file.arrayBuffer().then(buffer => {
+            // 嘗試提取 EXIF（僅 JPEG）
+            const exif = extractExifFromBuffer(buffer);
+            if (exif) {
+                STATE.exifData.set(this.id, exif);
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    this.state.originalImage = img;
+                    this.processAndRender();
+                };
+                img.src = e.target.result;
             };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(this.file);
+            reader.readAsDataURL(this.file);
+        });
     }
 
     processAndRender() {
@@ -584,6 +769,9 @@ class ImageProcessor {
         // Put Back (after watermark removal)
         this.elements.ctx.putImageData(processedImageData, 0, 0);
 
+        // 保存純淨版（不含 Logo）- 用於純淨版下載
+        this.state.cleanImageData = this.elements.ctx.getImageData(0, 0, canvas.width, canvas.height);
+
         // 疊加自訂 Logo（如果有設定的話）
         this.applyCustomLogo();
 
@@ -598,7 +786,8 @@ class ImageProcessor {
 
     /**
      * 疊加自訂 Logo 到圖片右下角
-     * Logo 會自動縮放以配合浮水印大小，並套用透明度
+     * Logo 會自動縮放以配合圖片比例，並套用透明度
+     * 大小基於原圖寬度的 3%~15%（scale 10%~300% 對應此範圍）
      */
     applyCustomLogo() {
         if (!STATE.customLogo.image) return;
@@ -608,47 +797,82 @@ class ImageProcessor {
         const logo = STATE.customLogo.image;
         const opacity = STATE.customLogo.opacity;
 
-        // 根據圖片尺寸決定 Logo 目標大小（與浮水印尺寸邏輯一致）
         const w = canvas.width;
         const h = canvas.height;
-        let mode = this.config.forceMode;
-        if (mode === 'auto') {
-            mode = (w > 1024 && h > 1024) ? 'large' : 'small';
-        }
+        const userScale = STATE.customLogo.scale; // 0.1 ~ 3.0
 
-        // 設定 Logo 目標尺寸，優先沿用 worker 偵測到的浮水印區域
-        const region = this.state.watermarkRegion;
-        const targetSize = region ? Math.min(region.width, region.height) : (mode === 'large' ? 96 : 48);
-        const fallbackMargin = mode === 'large' ? 192 : 96;
+        // 基於原圖寬度計算 Logo 大小
+        // scale 10%  → 原圖寬度 3%
+        // scale 100% → 原圖寬度 5%
+        // scale 300% → 原圖寬度 15%
+        const minPercent = 0.03;  // 最低 3% 圖寬
+        const maxPercent = 0.15;  // 最高 15% 圖寬
+        const percentRange = maxPercent - minPercent;
 
-        // 計算縮放比例（保持寬高比）
-        const scale = Math.min(targetSize / logo.width, targetSize / logo.height) * STATE.customLogo.scale;
+        // 將 scale 0.1~3.0 映射到 minPercent~maxPercent
+        const logoPercent = minPercent + percentRange * ((userScale - 0.1) / 2.9);
+        const targetSize = w * logoPercent;
+
+        // 計算縮放比例（保持寬高比，以 targetSize 為最大邊）
+        const scale = Math.min(targetSize / logo.width, targetSize / logo.height);
         const scaledWidth = logo.width * scale;
         const scaledHeight = logo.height * scale;
 
-        // 計算位置（與實際浮水印區域置中對齊）
-        const posX = region ? region.x + (region.width - scaledWidth) / 2 : w - fallbackMargin - scaledWidth;
-        const posY = region ? region.y + (region.height - scaledHeight) / 2 : h - fallbackMargin - scaledHeight;
+        // 計算位置（右下角，間距為圖寬的 2%）
+        const margin = w * 0.02;
+        const posX = w - margin - scaledWidth;
+        const posY = h - margin - scaledHeight;
 
         if (posX < 0 || posY < 0) return;
 
-        // 設定透明度並繪製 Logo
+        // 繪製 Logo
         ctx.save();
         ctx.globalAlpha = opacity;
         ctx.drawImage(logo, posX, posY, scaledWidth, scaledHeight);
         ctx.restore();
     }
 
-    download() {
-        if (!this.state.processedImageData) return;
+    /**
+     * 取得要下載的圖像資料
+     * @param {boolean} isClean - 是否為純淨版（不含 Logo）
+     */
+    getImageForDownload(isClean) {
+        if (isClean) {
+            return this.state.cleanImageData || this.state.processedImageData;
+        }
+        return this.state.processedImageData;
+    }
+
+    /**
+     * 下載圖片
+     * @param {boolean} isClean - 是否為純淨版（不含 Logo）
+     */
+    download(isClean = false) {
+        const imageData = this.getImageForDownload(isClean);
+        if (!imageData) return;
 
         const format = STATE.downloadFormat;
         const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
         const ext = format === 'jpeg' ? '.jpg' : '.png';
-        const quality = format === 'jpeg' ? 0.85 : undefined; // JPEG 壓縮品質
+        const quality = format === 'jpeg' ? 0.85 : undefined;
 
-        // 如果啟用自動縮小，強制縮放到目標尺寸
-        let outputCanvas = this.elements.canvas;
+        // 建立臨時 canvas 來處理圖片
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = imageData.width;
+        tempCanvas.height = imageData.height;
+        const tempCtx = tempCanvas.getContext('2d');
+
+        // 繪製 ImageData
+        tempCtx.putImageData(imageData, 0, 0);
+
+        // 應用銳化（如果啟用）
+        if (STATE.enableSharpen && !isClean) {
+            const sharpened = applySharpen(tempCanvas, tempCtx);
+            tempCtx.putImageData(sharpened, 0, 0);
+        }
+
+        // 處理縮放
+        let outputCanvas = tempCanvas;
         const preset = STATE.resizePreset;
         if (preset) {
             const isLandscape = outputCanvas.width > outputCanvas.height;
@@ -657,7 +881,7 @@ class ImageProcessor {
             if (preset === '1920x1080') {
                 targetW = isLandscape ? 1920 : 1080;
                 targetH = isLandscape ? 1080 : 1920;
-            } else { // '1280x720'
+            } else {
                 targetW = isLandscape ? 1280 : 720;
                 targetH = isLandscape ? 720 : 1280;
             }
@@ -666,30 +890,36 @@ class ImageProcessor {
             resizedCanvas.width = targetW;
             resizedCanvas.height = targetH;
             const ctx = resizedCanvas.getContext('2d');
-
-            // 強制拉伸繪製
             ctx.drawImage(outputCanvas, 0, 0, targetW, targetH);
-
             outputCanvas = resizedCanvas;
         }
 
-        outputCanvas.toBlob((blob) => {
+        // 取得 EXIF 資料（僅 JPEG + 保留 EXIF 選項）
+        const exif = (STATE.keepExif && format === 'jpeg')
+            ? STATE.exifData.get(this.id)
+            : null;
+
+        // 下載
+        writeExifToBlob(outputCanvas, exif, mimeType).then((blob) => {
             if (!blob) return;
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
-            // Construct filename with orientation prefix
+
+            // 構建檔名
             const nameParts = this.file.name.split('.');
-            nameParts.pop(); // remove extension
-            const suffix = Localization.get('cleanSuffix') || '_clean';
+            nameParts.pop();
+            const suffix = isClean ? '' : (Localization.get('cleanSuffix') || '_clean');
             const w = outputCanvas.width;
             const h = outputCanvas.height;
-            const prefix = w > h ? 'R_' : 'S_';
-            link.download = `${prefix}${nameParts.join('.')}${suffix}${ext}`;
+            const dirPrefix = w > h ? 'R_' : 'S_';
+            const userPrefix = STATE.filenamePrefix || '';
+
+            link.download = `${userPrefix}${dirPrefix}${nameParts.join('.')}${suffix}${ext}`;
 
             link.href = url;
             link.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
-        }, mimeType, quality);
+        });
     }
 
     destroy() {
@@ -795,119 +1025,191 @@ window.addEventListener('paste', (e) => {
 });
 
 
-// Download All
-downloadAllBtn.addEventListener('click', async () => {
-    // Check if JSZip is loaded
+// =============================================================================
+// Download Functions
+// =============================================================================
+
+/**
+ * 批次下載所有圖片
+ * @param {boolean} isClean - 是否為純淨版（不含 Logo）
+ */
+async function downloadAll(isClean = false) {
+    if (STATE.processors.length === 0) return;
+
+    // 禁用按鈕並顯示進度條
+    const btn = isClean ? downloadCleanBtn : downloadAllBtn;
+    const folderName = isClean ? 'gemini_clean_only' : 'gemini_with_logo';
+
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span>${Localization.get('progressLabel') || '處理中...'}</span>`;
+    }
+    if (batchProgress) batchProgress.style.display = 'flex';
+
+    // 無 JSZip 時降級到依序下載
     if (typeof JSZip === 'undefined') {
-        // Fallback to sequential download
         let delay = 0;
-        STATE.processors.forEach(p => {
+        STATE.processors.forEach((p, i) => {
             setTimeout(() => {
-                p.download();
+                p.download(isClean);
+                updateProgress(i + 1, STATE.processors.length);
             }, delay);
-            delay += 300;
+            delay += 500;
         });
+        setTimeout(() => {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = isClean
+                    ? '<span data-i18n="downloadClean">純淨版</span>'
+                    : '<span data-i18n="downloadAll">含 Logo 版</span>';
+            }
+            if (batchProgress) batchProgress.style.display = 'none';
+            Localization.apply();
+        }, STATE.processors.length * 500 + 1000);
         return;
     }
 
-    // ZIP Batch Download
     const zip = new JSZip();
-    const folderName = Localization.get('zipFolderName') || 'processed_images';
     const folder = zip.folder(folderName);
-    const usedNames = new Set(); // To ensure uniqueness in ZIP
-
-    // Disable button to prevent double clicks
-    downloadAllBtn.disabled = true;
-    const originalBtnText = downloadAllBtn.innerHTML;
-    downloadAllBtn.innerHTML = '<span>Packaging...</span>';
+    const usedNames = new Set();
 
     try {
-        const promises = STATE.processors.map(p => {
-            // 確保我們拿到的是已經處理過的圖片 Canvas
-            if (!p.state.processedImageData) return null;
+        const total = STATE.processors.length;
+        const completed = { count: 0 };
 
-            return new Promise((resolve) => {
-                const format = STATE.downloadFormat;
-                const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
-                const ext = format === 'jpeg' ? '.jpg' : '.png';
-                const quality = format === 'jpeg' ? 0.85 : undefined;
+        const promises = STATE.processors.map(p => new Promise(async (resolve) => {
+            const imageData = p.getImageForDownload(isClean);
+            if (!imageData) {
+                updateProgress(++completed.count, total);
+                resolve(false);
+                return;
+            }
 
-                // Construct filename
-                const nameParts = p.file.name.split('.');
-                nameParts.pop(); // remove extension
-                const suffix = Localization.get('cleanSuffix') || '_clean';
-                let filename = `${nameParts.join('.')}${suffix}${ext}`;
+            const format = STATE.downloadFormat;
+            const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const ext = format === 'jpeg' ? '.jpg' : '.png';
+            const quality = format === 'jpeg' ? 0.85 : undefined;
 
-                // Ensure uniqueness in ZIP
-                if (usedNames.has(filename)) {
-                    let counter = 1;
-                    const basePart = filename.substring(0, filename.lastIndexOf(suffix));
-                    while (usedNames.has(filename)) {
-                        filename = `${basePart}_${counter}${suffix}${ext}`;
-                        counter++;
-                    }
+            // 建立臨時 canvas
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = imageData.width;
+            tempCanvas.height = imageData.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.putImageData(imageData, 0, 0);
+
+            // 銳化（如果啟用）
+            if (STATE.enableSharpen && !isClean) {
+                const sharpened = applySharpen(tempCanvas, tempCtx);
+                tempCtx.putImageData(sharpened, 0, 0);
+            }
+
+            // 縮放
+            let outputCanvas = tempCanvas;
+            const preset = STATE.resizePreset;
+            if (preset) {
+                const isLandscape = outputCanvas.width > outputCanvas.height;
+                let targetW = isLandscape ? 1920 : 1080;
+                let targetH = isLandscape ? 1080 : 1920;
+                if (preset === '1280x720') {
+                    targetW = isLandscape ? 1280 : 720;
+                    targetH = isLandscape ? 720 : 1280;
                 }
-                usedNames.add(filename);
+                const resized = document.createElement('canvas');
+                resized.width = targetW;
+                resized.height = targetH;
+                resized.getContext('2d').drawImage(outputCanvas, 0, 0, targetW, targetH);
+                outputCanvas = resized;
+            }
 
-                // 個別圖片 resize 處理
-                let sourceCanvas = p.elements.canvas;
-                const preset = STATE.resizePreset;
-                if (preset) {
-                    const isLandscape = sourceCanvas.width > sourceCanvas.height;
-                    let targetW, targetH;
+            // EXIF
+            const exif = (STATE.keepExif && format === 'jpeg') ? STATE.exifData.get(p.id) : null;
 
-                    if (preset === '1920x1080') {
-                        targetW = isLandscape ? 1920 : 1080;
-                        targetH = isLandscape ? 1080 : 1920;
-                    } else { // '1280x720'
-                        targetW = isLandscape ? 1280 : 720;
-                        targetH = isLandscape ? 720 : 1280;
-                    }
+            // 構建檔名
+            const nameParts = p.file.name.split('.');
+            nameParts.pop();
+            const suffix = isClean ? '' : (Localization.get('cleanSuffix') || '_clean');
+            let filename = `${nameParts.join('.')}${suffix}${ext}`;
 
-                    const resizedCanvas = document.createElement('canvas');
-                    resizedCanvas.width = targetW;
-                    resizedCanvas.height = targetH;
-                    const ctx = resizedCanvas.getContext('2d');
-                    ctx.drawImage(sourceCanvas, 0, 0, targetW, targetH);
-
-                    sourceCanvas = resizedCanvas;
+            if (usedNames.has(filename)) {
+                let counter = 1;
+                const basePart = filename.substring(0, filename.lastIndexOf(suffix));
+                const extStart = filename.lastIndexOf(ext);
+                while (usedNames.has(filename)) {
+                    filename = `${basePart}_${counter}${suffix}${ext}`;
+                    counter++;
                 }
+            }
+            usedNames.add(filename);
 
-                // 根據最終尺寸決定方向前綴
-                const fw = sourceCanvas.width;
-                const fh = sourceCanvas.height;
-                const prefix = fw > fh ? 'R_' : 'S_';
-                filename = `${prefix}${filename}`;
+            const fw = outputCanvas.width;
+            const fh = outputCanvas.height;
+            const dirPrefix = fw > fh ? 'R_' : 'S_';
+            const userPrefix = STATE.filenamePrefix || '';
+            filename = `${userPrefix}${dirPrefix}${filename}`;
 
-                sourceCanvas.toBlob((blob) => {
-                    if (blob) {
-                        folder.file(filename, blob);
-                    }
-                    resolve();
-                }, mimeType, quality);
-            });
-        });
+            const blob = await writeExifToBlob(outputCanvas, exif, mimeType);
+            if (blob) folder.file(filename, blob);
+
+            updateProgress(++completed.count, total);
+            resolve(true);
+        }));
 
         await Promise.all(promises);
 
-        const content = await zip.generateAsync({ type: "blob" });
+        const content = await zip.generateAsync({ type: 'blob' });
         const url = URL.createObjectURL(content);
-
         const link = document.createElement('a');
-        link.download = 'gemini_watermark_removed.zip';
+        link.download = `gemini_${folderName}_${Date.now()}.zip`;
         link.href = url;
         link.click();
-
         setTimeout(() => URL.revokeObjectURL(url), 1000);
 
     } catch (err) {
-        console.error("ZIP generation failed:", err);
-        alert("Failed to create ZIP file. Falling back to individual downloads.");
+        console.error('ZIP generation failed:', err);
+        alert('建立 ZIP 失敗，已改為個別下載。');
+        // 降級到依序下載
+        STATE.processors.forEach(p => p.download(isClean));
     } finally {
-        downloadAllBtn.disabled = false;
-        downloadAllBtn.innerHTML = originalBtnText;
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = isClean
+                ? `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg><span data-i18n="downloadClean">純淨版</span>`
+                : `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg><span data-i18n="downloadAll">含 Logo 版</span>`;
+            Localization.apply();
+        }
+        if (batchProgress) batchProgress.style.display = 'none';
+        updateProgress(0, 0);
     }
-});
+}
+
+/**
+ * 更新批次下載進度條
+ */
+function updateProgress(current, total) {
+    if (!progressFill || !progressText) return;
+    if (total === 0) {
+        progressFill.style.width = '0%';
+        progressText.textContent = '';
+        return;
+    }
+    const pct = Math.round((current / total) * 100);
+    progressFill.style.width = pct + '%';
+    progressText.textContent = `${current}/${total} (${pct}%)`;
+}
+
+// 按鈕事件：含 Logo 版下載（點擊卡片下載按鈕也走這條）
+downloadAllBtn.addEventListener('click', () => downloadAll(false));
+
+// 按鈕事件：純淨版下載（需要確保元素存在）
+if (downloadCleanBtn) {
+    downloadCleanBtn.addEventListener('click', () => downloadAll(true));
+}
+
+function reprocessAllImages() {
+    STATE.processors.forEach(p => {
+        p.processAndRender();
+    });
+}
 
 // Download Format Selector
 const downloadFormatSelect = document.getElementById('downloadFormat');
@@ -922,6 +1224,78 @@ if (resizePresetSelect) {
     resizePresetSelect.addEventListener('change', (e) => {
         STATE.resizePreset = e.target.value;
     });
+}
+
+// EXIF 保留設定
+if (keepExifCheckbox) {
+    keepExifCheckbox.addEventListener('change', (e) => {
+        STATE.keepExif = e.target.checked;
+    });
+    keepExifCheckbox.checked = STATE.keepExif;
+}
+
+// 銳化設定
+if (enableSharpenCheckbox) {
+    enableSharpenCheckbox.addEventListener('change', (e) => {
+        STATE.enableSharpen = e.target.checked;
+    });
+}
+
+// 檔名前綴設定
+if (filenamePrefixInput) {
+    filenamePrefixInput.addEventListener('input', (e) => {
+        STATE.filenamePrefix = e.target.value;
+    });
+}
+
+// =============================================================================
+// 圖片排序功能
+// =============================================================================
+
+function applySort() {
+    const sortBy = STATE.sortBy;
+    const sortOrder = STATE.sortOrder;
+
+    STATE.processors.sort((a, b) => {
+        let valA, valB;
+        if (sortBy === 'name') {
+            valA = a.file.name.toLowerCase();
+            valB = b.file.name.toLowerCase();
+        } else {
+            // 依時間：使用 lastModified 或 Date.now()
+            valA = a.file.lastModified || 0;
+            valB = b.file.lastModified || 0;
+        }
+
+        if (sortOrder === 'asc') {
+            return valA < valB ? -1 : (valA > valB ? 1 : 0);
+        } else {
+            return valA > valB ? -1 : (valA < valB ? 1 : 0);
+        }
+    });
+
+    // 重新渲染順序（移除並重新加入 DOM）
+    resultsContainer.innerHTML = '';
+    STATE.processors.forEach(p => {
+        resultsContainer.appendChild(p.elements.card);
+    });
+}
+
+// 排序設定事件
+if (sortBySelect) {
+    sortBySelect.addEventListener('change', (e) => {
+        STATE.sortBy = e.target.value;
+    });
+}
+
+if (sortOrderSelect) {
+    sortOrderSelect.addEventListener('change', (e) => {
+        STATE.sortOrder = e.target.value;
+    });
+}
+
+if (applySortBtn) {
+    applySortBtn.addEventListener('click', applySort);
 }
 
 // =============================================================================
@@ -992,6 +1366,16 @@ if (logoToggleHeader) {
         if (e.target.closest('#clearLogoBtn')) return;
 
         logoSettings.classList.toggle('collapsed');
+    });
+}
+
+// Output Settings 折疊/展開
+const outputSettings = document.getElementById('outputSettings');
+const outputToggleHeader = document.getElementById('outputToggleHeader');
+
+if (outputToggleHeader) {
+    outputToggleHeader.addEventListener('click', (e) => {
+        outputSettings.classList.toggle('collapsed');
     });
 }
 

@@ -43,7 +43,20 @@ const translations = {
         "resizeLabel": "輸出縮小:",
         "resizeOff": "關閉縮小",
         "resize1280x720": "1280×720",
-        "resize1920x1080": "1920×1080"
+        "resize1920x1080": "1920×1080",
+        "sortBy": "排序:",
+        "sortName": "依檔名",
+        "sortDate": "依時間",
+        "sortAsc": "升冪",
+        "sortDesc": "降冪",
+        "progressLabel": "處理進度:",
+        "exifLabel": "保留 EXIF",
+        "sharpenLabel": "銳化",
+        "fileNameTemplate": "檔名範本:",
+        "fileNamePrefix": "前綴:",
+        "downloadClean": "純淨版",
+        "downloadLogo": "含 Logo 版",
+        "optionsTitle": "輸出選項"
     },
     "zh-CN": {
         "appTitle": "Gemini 水印去除器 & 自动缩小",
@@ -89,7 +102,20 @@ const translations = {
         "resizeLabel": "自动缩小:",
         "resizeOff": "关闭缩小",
         "resize1280x720": "1280×720",
-        "resize1920x1080": "1920×1080"
+        "resize1920x1080": "1920×1080",
+        "sortBy": "排序:",
+        "sortName": "依档名",
+        "sortDate": "依时间",
+        "sortAsc": "升序",
+        "sortDesc": "降序",
+        "progressLabel": "处理进度:",
+        "exifLabel": "保留 EXIF",
+        "sharpenLabel": "锐化",
+        "fileNameTemplate": "档名模板:",
+        "fileNamePrefix": "前缀:",
+        "downloadClean": "纯净版",
+        "downloadLogo": "含 Logo 版",
+        "optionsTitle": "输出选项"
     },
     "en": {
         "appTitle": "Gemini Watermark Remover & Auto Resize",
@@ -135,7 +161,20 @@ const translations = {
         "resizeLabel": "Auto Resize:",
         "resizeOff": "Off",
         "resize1280x720": "1280×720",
-        "resize1920x1080": "1920×1080"
+        "resize1920x1080": "1920×1080",
+        "sortBy": "Sort:",
+        "sortName": "By Name",
+        "sortDate": "By Date",
+        "sortAsc": "Ascending",
+        "sortDesc": "Descending",
+        "progressLabel": "Progress:",
+        "exifLabel": "Keep EXIF",
+        "sharpenLabel": "Sharpen",
+        "fileNameTemplate": "Filename:",
+        "fileNamePrefix": "Prefix:",
+        "downloadClean": "Clean Only",
+        "downloadLogo": "With Logo",
+        "optionsTitle": "Output Options"
     },
     "ja": {
         "appTitle": "Gemini 透かし除去ツール & 自動リサイズ",
@@ -181,7 +220,20 @@ const translations = {
         "resizeLabel": "自動リサイズ:",
         "resizeOff": "끔",
         "resize1280x720": "1280×720",
-        "resize1920x1080": "1920×1080"
+        "resize1920x1080": "1920×1080",
+        "sortBy": "排序:",
+        "sortName": "依檔名",
+        "sortDate": "依時間",
+        "sortAsc": "昇冪",
+        "sortDesc": "降冪",
+        "progressLabel": "處理進度:",
+        "exifLabel": "EXIF 保持",
+        "sharpenLabel": "シャープ化",
+        "fileNameTemplate": "ファイル名:",
+        "fileNamePrefix": "接頭辞:",
+        "downloadClean": "クリーン版",
+        "downloadLogo": "ロゴ版",
+        "optionsTitle": "出力オプション"
     },
     "ko": {
         "appTitle": "Gemini 워터마크 제거기 & 자동 크기调整",
@@ -227,6 +279,19 @@ const translations = {
         "resizeLabel": "자동 크기调整:",
         "resizeOff": "끔",
         "resize1280x720": "1280×720",
-        "resize1920x1080": "1920×1080"
+        "resize1920x1080": "1920×1080",
+        "sortBy": "정렬:",
+        "sortName": "이름순",
+        "sortDate": "날짜순",
+        "sortAsc": "오름차순",
+        "sortDesc": "내림차순",
+        "progressLabel": "진행률:",
+        "exifLabel": "EXIF 유지",
+        "sharpenLabel": "선명화",
+        "fileNameTemplate": "파일명:",
+        "fileNamePrefix": "접두사:",
+        "downloadClean": "클린 버전",
+        "downloadLogo": "로고 포함",
+        "optionsTitle": "출력 옵션"
     }
 };

@@ -63,30 +63,94 @@
         </header>
 
         <div class="app-card">
-            <!-- Global Actions (Moved to Top) -->
+            <!-- 輸出選項設定區塊（可收合式） -->
+            <div id="outputSettings" class="logo-settings">
+                <div class="logo-header" id="outputToggleHeader">
+                    <div class="logo-header-left">
+                        <svg class="logo-toggle-icon" width="16" height="16" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                        <span class="logo-title" data-i18n="optionsTitle">⚙️ 輸出選項</span>
+                    </div>
+                </div>
+
+                <div class="logo-content">
+                    <!-- 第一列：格式+縮小 -->
+                    <div class="output-row">
+                        <div class="format-selector">
+                            <label><span data-i18n="formatLabel">格式:</span></label>
+                            <select id="downloadFormat">
+                                <option value="png" data-i18n="formatPng">PNG (無損)</option>
+                                <option value="jpeg" data-i18n="formatJpeg">JPEG (壓縮)</option>
+                            </select>
+                        </div>
+                        <div class="resize-selector">
+                            <label><span data-i18n="resizeLabel">輸出縮小:</span></label>
+                            <select id="resizePreset">
+                                <option value="" data-i18n="resizeOff">關閉縮小</option>
+                                <option value="1280x720" selected data-i18n="resize1280x720">1280×720</option>
+                                <option value="1920x1080" data-i18n="resize1920x1080">1920×1080</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- 第二列：EXIF+銳化+檔名範本 -->
+                    <div class="output-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="keepExif" checked>
+                            <span data-i18n="exifLabel">保留 EXIF</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enableSharpen">
+                            <span data-i18n="sharpenLabel">銳化</span>
+                        </label>
+                        <div class="filename-prefix">
+                            <label><span data-i18n="fileNamePrefix">前綴:</span></label>
+                            <input type="text" id="filenamePrefix" placeholder="R_" maxlength="20">
+                        </div>
+                    </div>
+                    <!-- 第三列：排序 -->
+                    <div class="output-row">
+                        <div class="sort-selector">
+                            <label><span data-i18n="sortBy">排序:</span></label>
+                            <select id="sortBy">
+                                <option value="name" data-i18n="sortName">依檔名</option>
+                                <option value="date" data-i18n="sortDate">依時間</option>
+                            </select>
+                            <select id="sortOrder">
+                                <option value="asc" data-i18n="sortAsc">升冪</option>
+                                <option value="desc" data-i18n="sortDesc">降冪</option>
+                            </select>
+                            <button id="applySortBtn" class="btn btn-small btn-secondary">套用排序</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Actions -->
             <div id="globalActions" class="global-actions"
                 style="display: none; justify-content: flex-end; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                <div class="format-selector">
-                    <label><span data-i18n="formatLabel">格式:</span></label>
-                    <select id="downloadFormat">
-                        <option value="png" data-i18n="formatPng">PNG (無損)</option>
-                        <option value="jpeg" data-i18n="formatJpeg">JPEG (壓縮)</option>
-                    </select>
+                <!-- 批次進度條 -->
+                <div id="batchProgress" class="batch-progress" style="display: none;">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                    <span id="progressText" class="progress-text">0%</span>
                 </div>
-                <div class="resize-selector">
-                    <label><span data-i18n="resizeLabel">輸出縮小:</span> 1280×720</label>
-                    <select id="resizePreset">
-                        <option value="" data-i18n="resizeOff">關閉縮小</option>
-                        <option value="1280x720" selected data-i18n="resize1280x720">1280×720</option>
-                        <option value="1920x1080" data-i18n="resize1920x1080">1920×1080</option>
-                    </select>
-                </div>
-                <button id="downloadAllBtn" class="btn btn-primary">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <button id="downloadCleanBtn" class="btn btn-secondary">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
-                    <span data-i18n="downloadAll">全部下載</span>
+                    <span data-i18n="downloadClean">純淨版</span>
+                </button>
+                <button id="downloadAllBtn" class="btn btn-primary">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    <span data-i18n="downloadAll">含 Logo 版</span>
                 </button>
             </div>
 
@@ -138,7 +202,7 @@
                         </div>
                         <div class="logo-control-group">
                             <label><span data-i18n="scaleLabel">大小:</span> <span id="logoScaleValue">100%</span></label>
-                            <input type="range" id="logoScale" min="10" max="200" value="100">
+                            <input type="range" id="logoScale" min="10" max="300" value="100">
                         </div>
                     </div>
                 </div>

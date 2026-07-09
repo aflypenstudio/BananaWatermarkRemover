@@ -603,6 +603,117 @@ body.has-files .app-card {
   display: flex;
   padding: 0 1rem;
   margin-bottom: 0.25rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Output Settings */
+.output-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.output-row:first-child {
+  margin-top: 0;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  height: auto;
+  cursor: pointer;
+  accent-color: #7c3aed;
+}
+
+.filename-prefix {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filename-prefix label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.filename-prefix input[type="text"] {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  background: var(--bg-color);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  width: 120px;
+}
+
+.filename-prefix input[type="text"]:focus {
+  outline: none;
+  border-color: #7c3aed;
+}
+
+.sort-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sort-selector label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.sort-selector select {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+/* Batch Progress */
+.batch-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 200px;
+  max-width: 400px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+[data-theme="light"] .progress-bar {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  min-width: 40px;
+  text-align: right;
 }
 
 /* Logo Settings (Collapsible) */
