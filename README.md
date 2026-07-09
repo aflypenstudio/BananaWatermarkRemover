@@ -20,8 +20,20 @@ This project is a **modified version** focused on watermark removal with additio
 
 ## ✨ Key Features
 
-- **🚫 Automatic Watermark Removal**: Uses a Reverse Alpha Blending algorithm to precisely restore pixels covered by the watermark.
-- **🎨 Custom Logo Support**: Upload your own logo to replace the original watermark with adjustable opacity (0% ~ 100%) and size (10% ~ 300%).
+- **🚫 Automatic Watermark Removal**: Uses a Reverse Alpha Blending algorithm with multi-dimensional auto strength detection to precisely restore pixels covered by the watermark.
+  - Search range: 0.05 ~ 2.0 (optimized from 0.1 ~ 1.2)
+  - Step precision: 0.01 (doubled from 0.02)
+  - Multi-dimensional evaluation: brightness uniformity, edge blending, peak detection
+- **🎨 Smart Logo Overlay**: Upload your own logo to replace/cover the watermark area with intelligent positioning:
+  - **Auto Positioning**: Logo automatically centers on the detected watermark position
+  - **Consistent Size**: Logo size calculated based on image's shorter edge (same size for landscape & portrait)
+  - **Adjustable Settings**: Opacity 0% ~ 100% (default: 20%), Size 10% ~ 300% (default: 200%)
+- **🔧 Output Options**:
+  - **Resize Presets**: 1280×720 / 1920×1080 (or disable)
+  - **Keep EXIF**: Preserve original image metadata
+  - **Sharpen**: Apply sharpening filter for better visual quality
+  - **Filename Prefix**: Customize output filename prefix
+  - **Sort**: Organize images by name or date, ascending or descending
 - **📥 Flexible Download Options**:
   - **Single Image**: Click download for Logo version (R_/S_ prefix). Check the "N" box before downloading for a no-logo version (N_ prefix).
   - **Batch Download**: When logo is uploaded, ZIP includes both versions:
