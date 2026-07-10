@@ -1837,6 +1837,10 @@ const Lightbox = {
                 case 'E':
                     this.rotateRight();
                     break;
+                case 'p':
+                case 'P':
+                    this.toggleSettingsPanel();
+                    break;
             }
         });
 
@@ -1871,6 +1875,119 @@ const Lightbox = {
         document.getElementById('lightboxFlipV')?.addEventListener('click', () => this.flipVertical());
         document.getElementById('lightboxRotateL')?.addEventListener('click', () => this.rotateLeft());
         document.getElementById('lightboxRotateR')?.addEventListener('click', () => this.rotateRight());
+
+        // 設定面板
+        document.getElementById('lightboxSettings')?.addEventListener('click', () => this.openSettingsPanel());
+        document.getElementById('lightboxSettingsClose')?.addEventListener('click', () => this.closeSettingsPanel());
+        document.getElementById('settingsCancel')?.addEventListener('click', () => this.cancelSettings());
+        document.getElementById('settingsApply')?.addEventListener('click', () => this.applySettings());
+
+        // 強度滑桿即時更新顯示
+        document.getElementById('settingsStrength')?.addEventListener('input', (e) => {
+            document.getElementById('settingsStrengthValue').textContent = parseFloat(e.target.value).toFixed(2);
+        });
+    },
+
+    // ===== 設定面板控制 =====
+
+    openSettingsPanel() {
+        const panel = document.getElementById('lightboxSettingsPanel');
+        if (!panel) return;
+
+        // 套用翻譯
+        const i18nElements = panel.querySelectorAll('[data-i18n]');
+        i18nElements.forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            el.textContent = Localization.get(key);
+        });
+
+        // 取得當前 processor 的設定
+        let processor = null;
+        if (this.currentIndex >= 0 && this.currentIndex < STATE.processors.length) {
+            processor = STATE.processors[this.currentIndex];
+        }
+
+        // 填入當前設定值
+        if (processor) {
+            const strength = processor.state.detectedStrength || 1;
+            document.getElementById('settingsStrength').value = strength;
+            document.getElementById('settingsStrengthValue').textContent = strength.toFixed(2);
+
+            const position = processor.state.maskingMode || 'auto';
+            document.querySelector(`input[name="settingsPosition"][value="${position}"]`).checked = true;
+
+            const size = processor.state.sizeMode || 'auto';
+            document.querySelector(`input[name="settingsSize"][value="${size}"]`).checked = true;
+        } else {
+            document.getElementById('settingsStrength').value = 1;
+            document.getElementById('settingsStrengthValue').textContent = '1.00';
+            document.querySelector('input[name="settingsPosition"][value="auto"]').checked = true;
+            document.querySelector('input[name="settingsSize"][value="auto"]').checked = true;
+        }
+
+        // 儲存原始設定用於取消
+        this._settingsBackup = {
+            strength: parseFloat(document.getElementById('settingsStrength').value),
+            position: document.querySelector('input[name="settingsPosition"]:checked').value,
+            size: document.querySelector('input[name="settingsSize"]:checked').value
+        };
+
+        panel.classList.add('visible');
+    },
+
+    closeSettingsPanel() {
+        const panel = document.getElementById('lightboxSettingsPanel');
+        panel?.classList.remove('visible');
+    },
+
+    toggleSettingsPanel() {
+        const panel = document.getElementById('lightboxSettingsPanel');
+        if (!panel) return;
+
+        if (panel.classList.contains('visible')) {
+            this.closeSettingsPanel();
+        } else {
+            this.openSettingsPanel();
+        }
+    },
+
+    cancelSettings() {
+        // 恢復原設定
+        if (this._settingsBackup) {
+            // 不做任何變更
+        }
+        this.closeSettingsPanel();
+    },
+
+    applySettings() {
+        const processor = this.currentIndex >= 0 ? STATE.processors[this.currentIndex] : null;
+        if (!processor) {
+            this.closeSettingsPanel();
+            return;
+        }
+
+        // 取得新設定
+        const strength = parseFloat(document.getElementById('settingsStrength').value);
+        const position = document.querySelector('input[name="settingsPosition"]:checked').value;
+        const size = document.querySelector('input[name="settingsSize"]:checked').value;
+        const livePreview = document.getElementById('settingsLivePreview').checked;
+
+        // 更新 processor 設定
+        processor.state.detectedStrength = strength;
+        processor.state.maskingMode = position;
+        processor.state.sizeMode = size;
+
+        // 重新處理
+        processor.state.paramsUpdated = true; // 標記需要重新處理
+        processor.process();
+
+        // 關閉面板
+        this.closeSettingsPanel();
+
+        // 更新顯示
+        this.activeProcessed = processor.canvas.toDataURL();
+        this.elements.img.src = this.activeProcessed;
+        this.applyTransform();
     },
 
     /**

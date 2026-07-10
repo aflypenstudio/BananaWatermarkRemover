@@ -66,7 +66,19 @@ const translations = {
         "zoomIn": "放大",
         "zoomOut": "縮小",
         "zoomReset": "重置",
-        "currentZoom": "縮放"
+        "currentZoom": "縮放",
+        "adjustParams": "調整參數",
+        "strength": "強度",
+        "watermarkPosition": "水印位置",
+        "watermarkSize": "水印大小",
+        "auto": "自動",
+        "newMargin": "新版",
+        "oldMargin": "舊版",
+        "forceSmall": "強制小",
+        "forceLarge": "強制大",
+        "livePreview": "即時預覽",
+        "cancel": "取消",
+        "apply": "套用"
     },
     "zh-CN": {
         "appTitle": "巴娜娜去水印&微调器",
@@ -135,7 +147,19 @@ const translations = {
         "zoomIn": "放大",
         "zoomOut": "缩小",
         "zoomReset": "重置",
-        "currentZoom": "缩放"
+        "currentZoom": "缩放",
+        "adjustParams": "调整参数",
+        "strength": "强度",
+        "watermarkPosition": "水印位置",
+        "watermarkSize": "水印大小",
+        "auto": "自动",
+        "newMargin": "新版",
+        "oldMargin": "旧版",
+        "forceSmall": "强制小",
+        "forceLarge": "强制大",
+        "livePreview": "实时预览",
+        "cancel": "取消",
+        "apply": "应用"
     },
     "en": {
         "appTitle": "Banana Watermark Remover & Adjuster",
@@ -204,7 +228,19 @@ const translations = {
         "zoomIn": "Zoom in",
         "zoomOut": "Zoom out",
         "zoomReset": "Reset",
-        "currentZoom": "Zoom"
+        "currentZoom": "Zoom",
+        "adjustParams": "Adjust Parameters",
+        "strength": "Strength",
+        "watermarkPosition": "Watermark Position",
+        "watermarkSize": "Watermark Size",
+        "auto": "Auto",
+        "newMargin": "New",
+        "oldMargin": "Old",
+        "forceSmall": "Force Small",
+        "forceLarge": "Force Large",
+        "livePreview": "Live Preview",
+        "cancel": "Cancel",
+        "apply": "Apply"
     },
     "ja": {
         "appTitle": "巴娜娜去水印&微調整ツール",
@@ -273,7 +309,19 @@ const translations = {
         "zoomIn": "拡大",
         "zoomOut": "縮小",
         "zoomReset": "リセット",
-        "currentZoom": "ズーム"
+        "currentZoom": "ズーム",
+        "adjustParams": "パラメータ調整",
+        "strength": "強度",
+        "watermarkPosition": "透かし位置",
+        "watermarkSize": "透かしサイズ",
+        "auto": "自動",
+        "newMargin": "新版",
+        "oldMargin": "旧版",
+        "forceSmall": "小強制",
+        "forceLarge": "大強制",
+        "livePreview": "ライブプレビュー",
+        "cancel": "キャンセル",
+        "apply": "適用"
     },
     "ko": {
         "appTitle": "바나나 워터마크 제거기 & 조정기",
@@ -342,6 +390,18 @@ const translations = {
         "zoomIn": "확대",
         "zoomOut": "축소",
         "zoomReset": "초기화",
-        "currentZoom": "확대/축소"
+        "currentZoom": "확대/축소",
+        "adjustParams": "매개변수 조정",
+        "strength": "강도",
+        "watermarkPosition": "워터마크 위치",
+        "watermarkSize": "워터마크 크기",
+        "auto": "자동",
+        "newMargin": "신규",
+        "oldMargin": "이전",
+        "forceSmall": "소强制",
+        "forceLarge": "대强制",
+        "livePreview": "실시간 미리보기",
+        "cancel": "취소",
+        "apply": "적용"
     }
 };
