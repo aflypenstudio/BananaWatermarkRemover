@@ -1970,7 +1970,6 @@ const Lightbox = {
         const strength = parseFloat(document.getElementById('settingsStrength').value);
         const position = document.querySelector('input[name="settingsPosition"]:checked').value;
         const size = document.querySelector('input[name="settingsSize"]:checked').value;
-        const livePreview = document.getElementById('settingsLivePreview').checked;
 
         // 更新 processor 設定
         processor.state.detectedStrength = strength;
@@ -1978,16 +1977,18 @@ const Lightbox = {
         processor.state.sizeMode = size;
 
         // 重新處理
-        processor.state.paramsUpdated = true; // 標記需要重新處理
-        processor.process();
+        processor.processAndRender();
 
         // 關閉面板
         this.closeSettingsPanel();
 
-        // 更新顯示
+        // 更新 Lightbox 顯示
         this.activeProcessed = processor.canvas.toDataURL();
         this.elements.img.src = this.activeProcessed;
         this.applyTransform();
+
+        // 顯示 Toast
+        this.showToast(Localization.get('apply') + ': ' + strength.toFixed(2));
     },
 
     /**
