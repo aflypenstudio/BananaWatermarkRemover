@@ -598,6 +598,103 @@ body.has-files .app-card {
   font-size: 1.2rem;
 }
 
+/* Batch Type Selector */
+.batch-type-selector {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.batch-type-check {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 38px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.batch-type-check:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.batch-type-check input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.batch-type-check span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.batch-type-check input[type="checkbox"]:checked + span {
+  color: #fff;
+}
+
+.batch-type-check input[type="checkbox"]:checked ~ * {
+  color: #fff;
+}
+
+/* Update for dark theme checkbox styling */
+.batch-type-check:has(input:checked) {
+  background: rgba(124, 58, 237, 0.3);
+}
+
+.batch-type-check input[type="checkbox"]:not(:checked) + span {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="light"] .batch-type-check {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .batch-type-check:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .batch-type-check:has(input:checked) {
+  background: rgba(124, 58, 237, 0.2);
+}
+
+[data-theme="light"] .batch-type-check span {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] .batch-type-check input[type="checkbox"]:checked + span {
+  color: #111827;
+}
+
+[data-theme="light"] .batch-type-check input[type="checkbox"]:not(:checked) + span {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* Card download type checkboxes */
+.actions .type-check {
+  position: relative;
+}
+
+.actions .type-check input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.actions .type-check:has(input:checked) {
+  background: rgba(124, 58, 237, 0.3) !important;
+}
+
 /* Global Actions */
 .global-actions {
   display: flex;

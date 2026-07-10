@@ -52,7 +52,10 @@ const translations = {
         "fileNameTemplate": "檔名範本:",
         "fileNamePrefix": "前綴:",
         "noLogoOption": "無 Logo 版本",
-        "optionsTitle": "輸出選項"
+        "optionsTitle": "輸出選項",
+        "clearAll": "清除全部",
+        "confirmClearAll": "確定要清除所有圖片？",
+        "selectDownloadType": "請至少選擇一種下載類型"
     },
     "zh-CN": {
         "appTitle": "Gemini 水印去除器 & 自动缩小",
@@ -107,7 +110,10 @@ const translations = {
         "fileNameTemplate": "档名模板:",
         "fileNamePrefix": "前缀:",
         "noLogoOption": "无 Logo 版本",
-        "optionsTitle": "输出选项"
+        "optionsTitle": "输出选项",
+        "clearAll": "清除全部",
+        "confirmClearAll": "确定要清除所有图片？",
+        "selectDownloadType": "请至少选择一种下载类型"
     },
     "en": {
         "appTitle": "Gemini Watermark Remover & Auto Resize",
@@ -162,7 +168,10 @@ const translations = {
         "fileNameTemplate": "Filename:",
         "fileNamePrefix": "Prefix:",
         "noLogoOption": "No Logo Version",
-        "optionsTitle": "Output Options"
+        "optionsTitle": "Output Options",
+        "clearAll": "Clear All",
+        "confirmClearAll": "Are you sure you want to clear all images?",
+        "selectDownloadType": "Please select at least one download type"
     },
     "ja": {
         "appTitle": "Gemini 透かし除去ツール & 自動リサイズ",
@@ -217,7 +226,10 @@ const translations = {
         "fileNameTemplate": "ファイル名:",
         "fileNamePrefix": "接頭辞:",
         "noLogoOption": "ロゴなしバージョン",
-        "optionsTitle": "出力オプション"
+        "optionsTitle": "出力オプション",
+        "clearAll": "すべてクリア",
+        "confirmClearAll": "すべての画像を削除してもよろしいですか？",
+        "selectDownloadType": "少なくとも1つのダウンロードタイプを選択してください"
     },
     "ko": {
         "appTitle": "Gemini 워터마크 제거기 & 자동 크기调整",
@@ -272,6 +284,9 @@ const translations = {
         "fileNameTemplate": "파일명:",
         "fileNamePrefix": "접두사:",
         "noLogoOption": "로고 없음 버전",
-        "optionsTitle": "출력 옵션"
+        "optionsTitle": "출력 옵션",
+        "clearAll": "모두 지우기",
+        "confirmClearAll": "모든 이미지를 삭제하시겠습니까?",
+        "selectDownloadType": "최소 하나의 다운로드 유형을 선택하세요"
     }
 };
