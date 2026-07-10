@@ -1,0 +1,61 @@
+name: Deploy & Version
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-and-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get commit hash
+        id: commit
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+
+      - name: Update asset URLs with version
+        env:
+          SHORT_SHA: ${{ steps.commit.outputs.short_sha }}
+        run: |
+          # Update script.js URL with commit hash
+          sed -i "s|script.js?v=1|script.js?v=$SHORT_SHA|g" index.html
+
+          # Update translations.js URL
+          sed -i "s|translations.js?v=1|translations.js?v=$SHORT_SHA|g" index.html
+
+          # Update style.css URL
+          sed -i "s|style.css?v=1|style.css?v=$SHORT_SHA|g" index.html
+
+          echo "Updated URLs with version: $SHORT_SHA"
+
+      - name: Update version in index.html
+        run: |
+          SHORT_SHA=${{ steps.commit.outputs.short_sha }}
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          NEW_VERSION="v$COMMIT_COUNT-$SHORT_SHA"
+          sed -i "s|<span id=\"appVersion\">[^<]*</span>|<span id=\"appVersion\">$NEW_VERSION</span>|g" index.html
+          echo "Version: $NEW_VERSION"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages
+          force_orphan: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Commit updated files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add index.html
+          git commit -m "chore: update version params [skip ci]" || echo "No changes to commit"
+          git push
