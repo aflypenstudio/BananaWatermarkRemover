@@ -1913,6 +1913,10 @@ const Lightbox = {
             document.getElementById('settingsStrength').value = strength;
             document.getElementById('settingsStrengthValue').textContent = strength.toFixed(2);
 
+            // 讀取自動強度狀態
+            const manualStrength = !processor.config.autoStrength;
+            document.getElementById('settingsManualStrength').checked = manualStrength;
+
             const position = processor.config.forcePosition || 'auto';
             document.querySelector(`input[name="settingsPosition"][value="${position}"]`).checked = true;
 
@@ -1968,11 +1972,13 @@ const Lightbox = {
 
         // 取得新設定
         const strength = parseFloat(document.getElementById('settingsStrength').value);
+        const manualStrength = document.getElementById('settingsManualStrength').checked;
         const position = document.querySelector('input[name="settingsPosition"]:checked').value;
         const size = document.querySelector('input[name="settingsSize"]:checked').value;
 
         // 更新 processor config（Worker 使用這些值）
         processor.config.alphaGain = strength;
+        processor.config.autoStrength = !manualStrength; // 取消勾選 = 停用自動
         processor.config.forcePosition = position;
         processor.config.forceMode = size;
 
