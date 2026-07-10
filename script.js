@@ -1262,6 +1262,7 @@ async function downloadAll() {
             const ext = format === 'jpeg' ? '.jpg' : '.png';
             const preset = STATE.resizePreset;
             const isLandscape = imageData.width > imageData.height;
+            const typePrefix = isLandscape ? 'R_' : 'S_'; // 橫式用 R_，直式用 S_
             const userPrefix = (filenamePrefixInput ? filenamePrefixInput.value : STATE.filenamePrefix) || '';
             const nameParts = p.file.name.split('.');
             nameParts.pop();
@@ -1294,17 +1295,17 @@ async function downloadAll() {
                 if (STATE.customLogo.image) p.applyCustomLogoToCanvas(outputCanvas);
 
                 let filename = `${nameParts.join('.')}${suffix}${ext}`;
-                let fullName = `${userPrefix}R_${filename}`;
+                let fullName = `${userPrefix}${typePrefix}${filename}`;
                 if (usedNames.has(fullName)) {
                     let counter = 1;
-                    while (usedNames.has(`${userPrefix}R_${nameParts.join('.')}_${counter}${suffix}${ext}`)) counter++;
+                    while (usedNames.has(`${userPrefix}${typePrefix}${nameParts.join('.')}_${counter}${suffix}${ext}`)) counter++;
                     filename = `${nameParts.join('.')}_${counter}${suffix}${ext}`;
                 }
-                usedNames.add(`${userPrefix}R_${filename}`);
+                usedNames.add(`${userPrefix}${typePrefix}${filename}`);
 
                 const exif = (STATE.keepExif && format === 'jpeg') ? STATE.exifData.get(p.id) : null;
                 const blob = await writeExifToBlob(outputCanvas, exif, mimeType);
-                if (blob) folder.file(`${userPrefix}R_${filename}`, blob);
+                if (blob) folder.file(`${userPrefix}${typePrefix}${filename}`, blob);
                 updateProgress(++completed.count, totalItems);
             }
 
