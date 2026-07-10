@@ -1983,8 +1983,7 @@ const Lightbox = {
         this.closeSettingsPanel();
 
         // 更新 Lightbox 顯示
-        this.activeProcessed = processor.canvas.toDataURL();
-        this.elements.img.src = this.activeProcessed;
+        this.elements.img.src = processor.elements.canvas.toDataURL();
         this.applyTransform();
 
         // 顯示 Toast
