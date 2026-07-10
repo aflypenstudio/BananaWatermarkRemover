@@ -287,63 +287,7 @@
                 </svg>
             </button>
 
-            <span class="lightbox-toolbar-divider"></span>
-
-            <!-- 參數調整按鈕 -->
-            <button class="lightbox-tool-btn" id="lightboxSettings" title="調整參數 (P)">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-            </button>
-        </div>
-
-        <!-- 參數調整面板 -->
-        <div class="lightbox-settings-panel" id="lightboxSettingsPanel">
-            <div class="settings-panel-header">
-                <span data-i18n="adjustParams">調整參數</span>
-                <button class="settings-close" id="lightboxSettingsClose">&times;</button>
-            </div>
-            <div class="settings-panel-body">
-                <!-- 強度 -->
-                <div class="settings-group">
-                    <label data-i18n="strength">強度</label>
-                    <input type="range" id="settingsStrength" min="0.05" max="2" step="0.01" value="1">
-                    <span id="settingsStrengthValue">1.00</span>
-                </div>
-                <!-- 手動強度開關 -->
-                <div class="settings-group">
-                    <label><input type="checkbox" id="settingsManualStrength"> <span data-i18n="manualStrength">停用自動強度（可手動調整）</span></label>
-                </div>
-                <!-- 水印位置 -->
-                <div class="settings-group">
-                    <label data-i18n="watermarkPosition">水印位置</label>
-                    <div class="settings-radio-group">
-                        <label><input type="radio" name="settingsPosition" value="auto" checked> <span data-i18n="auto">自動</span></label>
-                        <label><input type="radio" name="settingsPosition" value="new"> <span data-i18n="newMargin">新版</span></label>
-                        <label><input type="radio" name="settingsPosition" value="old"> <span data-i18n="oldMargin">舊版</span></label>
-                    </div>
-                </div>
-                <!-- 水印大小 -->
-                <div class="settings-group">
-                    <label data-i18n="watermarkSize">水印大小</label>
-                    <div class="settings-radio-group">
-                        <label><input type="radio" name="settingsSize" value="auto" checked> <span data-i18n="auto">自動</span></label>
-                        <label><input type="radio" name="settingsSize" value="small"> <span data-i18n="forceSmall">強制小</span></label>
-                        <label><input type="radio" name="settingsSize" value="large"> <span data-i18n="forceLarge">強制大</span></label>
-                    </div>
-                </div>
-                <!-- 即時預覽 -->
-                <div class="settings-group">
-                    <label><input type="checkbox" id="settingsLivePreview" checked> <span data-i18n="livePreview">即時預覽</span></label>
-                </div>
-            </div>
-            <div class="settings-panel-footer">
-                <button class="settings-btn settings-btn-cancel" id="settingsCancel" data-i18n="cancel">取消</button>
-                <button class="settings-btn settings-btn-apply" id="settingsApply" data-i18n="apply">套用</button>
-            </div>
-        </div>
-
+            
         <!-- 主圖片區域（用於縮放和平移） -->
         <div class="lightbox-image-container" id="lightboxImageContainer">
             <!-- 導航箭頭 -->

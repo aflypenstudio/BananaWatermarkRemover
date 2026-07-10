@@ -517,23 +517,20 @@ class ImageProcessor {
                         </svg>
                     </button>
                     <div class="download-buttons" style="display: flex; flex: 1; gap: 2px;">
-                        <button class="btn btn-secondary download-normal-btn" title="${Localization.get('downloadNormal') || '一般下載'}">
+                        <button class="btn btn-secondary download-normal-btn" title="${Localization.get('downloadNormal')}">
                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                             </svg>
-                            <span>${Localization.get('downloadNormal') || '一般'}</span>
                         </button>
-                        <button class="btn btn-secondary download-mirror-btn" title="${Localization.get('downloadMirror') || '鏡射下載'}">
+                        <button class="btn btn-secondary download-mirror-btn" title="${Localization.get('downloadMirror')}">
                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                             </svg>
-                            <span>${Localization.get('downloadMirror') || '鏡射'}</span>
                         </button>
-                        <button class="btn btn-secondary download-clean-btn" title="${Localization.get('downloadClean') || '純淨下載'}">
+                        <button class="btn btn-secondary download-clean-btn" title="${Localization.get('downloadClean')}">
                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <span>${Localization.get('downloadClean') || '純淨'}</span>
                         </button>
                     </div>
                 </div>
@@ -1837,11 +1834,7 @@ const Lightbox = {
                 case 'E':
                     this.rotateRight();
                     break;
-                case 'p':
-                case 'P':
-                    this.toggleSettingsPanel();
-                    break;
-            }
+                            }
         });
 
         // 长按显示原图
@@ -1876,164 +1869,7 @@ const Lightbox = {
         document.getElementById('lightboxRotateL')?.addEventListener('click', () => this.rotateLeft());
         document.getElementById('lightboxRotateR')?.addEventListener('click', () => this.rotateRight());
 
-        // 設定面板
-        document.getElementById('lightboxSettings')?.addEventListener('click', () => this.openSettingsPanel());
-        document.getElementById('lightboxSettingsClose')?.addEventListener('click', () => this.closeSettingsPanel());
-        document.getElementById('settingsCancel')?.addEventListener('click', () => this.cancelSettings());
-        document.getElementById('settingsApply')?.addEventListener('click', () => this.applySettings());
-
-        // 強度滑桿即時更新顯示
-        document.getElementById('settingsStrength')?.addEventListener('input', (e) => {
-            document.getElementById('settingsStrengthValue').textContent = parseFloat(e.target.value).toFixed(2);
-        });
-    },
-
-    // ===== 設定面板控制 =====
-
-    openSettingsPanel() {
-        const panel = document.getElementById('lightboxSettingsPanel');
-        if (!panel) return;
-
-        // 套用翻譯
-        const i18nElements = panel.querySelectorAll('[data-i18n]');
-        i18nElements.forEach(el => {
-            const key = el.getAttribute('data-i18n');
-            el.textContent = Localization.get(key);
-        });
-
-        // 取得當前 processor 的設定
-        let processor = null;
-        if (this.currentIndex >= 0 && this.currentIndex < STATE.processors.length) {
-            processor = STATE.processors[this.currentIndex];
-        }
-
-        // 填入當前設定值
-        if (processor) {
-            const strength = processor.config.alphaGain || 1;
-            document.getElementById('settingsStrength').value = strength;
-            document.getElementById('settingsStrengthValue').textContent = strength.toFixed(2);
-
-            // 讀取自動強度狀態
-            const manualStrength = !processor.config.autoStrength;
-            document.getElementById('settingsManualStrength').checked = manualStrength;
-
-            const position = processor.config.forcePosition || 'auto';
-            document.querySelector(`input[name="settingsPosition"][value="${position}"]`).checked = true;
-
-            const size = processor.config.forceMode || 'auto';
-            document.querySelector(`input[name="settingsSize"][value="${size}"]`).checked = true;
-        } else {
-            document.getElementById('settingsStrength').value = 1;
-            document.getElementById('settingsStrengthValue').textContent = '1.00';
-            document.querySelector('input[name="settingsPosition"][value="auto"]').checked = true;
-            document.querySelector('input[name="settingsSize"][value="auto"]').checked = true;
-        }
-
-        // 儲存原始設定用於取消
-        this._settingsBackup = {
-            alphaGain: processor.config.alphaGain,
-            autoStrength: processor.config.autoStrength,
-            forcePosition: processor.config.forcePosition,
-            forceMode: processor.config.forceMode
-        };
-
-        panel.classList.add('visible');
-    },
-
-    closeSettingsPanel() {
-        // 如果有未儲存的變更，恢復原設定
-        const processor = this.currentIndex >= 0 ? STATE.processors[this.currentIndex] : null;
-        if (this._settingsBackup && processor) {
-            processor.config.alphaGain = this._settingsBackup.alphaGain;
-            processor.config.autoStrength = this._settingsBackup.autoStrength;
-            processor.config.forcePosition = this._settingsBackup.forcePosition;
-            processor.config.forceMode = this._settingsBackup.forceMode;
-            this.updateMainUIControls(processor);
-        }
-
-        const panel = document.getElementById('lightboxSettingsPanel');
-        panel?.classList.remove('visible');
-    },
-
-    toggleSettingsPanel() {
-        const panel = document.getElementById('lightboxSettingsPanel');
-        if (!panel) return;
-
-        if (panel.classList.contains('visible')) {
-            this.closeSettingsPanel();
-        } else {
-            this.openSettingsPanel();
-        }
-    },
-
-    cancelSettings() {
-        const processor = this.currentIndex >= 0 ? STATE.processors[this.currentIndex] : null;
-
-        // 恢復原設定
-        if (this._settingsBackup && processor) {
-            processor.config.alphaGain = this._settingsBackup.alphaGain;
-            processor.config.autoStrength = this._settingsBackup.autoStrength;
-            processor.config.forcePosition = this._settingsBackup.forcePosition;
-            processor.config.forceMode = this._settingsBackup.forceMode;
-
-            // 更新主畫面控制項
-            this.updateMainUIControls(processor);
-        }
-
-        this.closeSettingsPanel();
-    },
-
-    updateMainUIControls(processor) {
-        if (!processor || !processor.elements.card) return;
-
-        // 更新大小選擇
-        if (processor.elements.sizeSelect) {
-            processor.elements.sizeSelect.value = processor.config.forceMode || 'auto';
-        }
-
-        // 更新位置選擇
-        if (processor.elements.positionSelect) {
-            processor.elements.positionSelect.value = processor.config.forcePosition || 'auto';
-        }
-
-        // 更新自動強度檢查框
-        if (processor.elements.autoStrengthCheck) {
-            processor.elements.autoStrengthCheck.checked = processor.config.autoStrength;
-        }
-    },
-
-    applySettings() {
-        const processor = this.currentIndex >= 0 ? STATE.processors[this.currentIndex] : null;
-        if (!processor) {
-            this.closeSettingsPanel();
-            return;
-        }
-
-        // 取得新設定
-        const strength = parseFloat(document.getElementById('settingsStrength').value);
-        const manualStrength = document.getElementById('settingsManualStrength').checked;
-        const position = document.querySelector('input[name="settingsPosition"]:checked').value;
-        const size = document.querySelector('input[name="settingsSize"]:checked').value;
-
-        // 更新 processor config（Worker 使用這些值）
-        processor.config.alphaGain = strength;
-        processor.config.autoStrength = !manualStrength; // 取消勾選 = 停用自動
-        processor.config.forcePosition = position;
-        processor.config.forceMode = size;
-
-        // 重新處理
-        processor.processAndRender();
-
-        // 關閉面板
-        this.closeSettingsPanel();
-
-        // 更新 Lightbox 顯示
-        this.elements.img.src = processor.elements.canvas.toDataURL();
-        this.applyTransform();
-
-        // 顯示 Toast
-        this.showToast(Localization.get('apply') + ': ' + strength.toFixed(2));
-    },
+            },
 
     /**
      * 開啟 Lightbox
