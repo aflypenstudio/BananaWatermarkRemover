@@ -243,31 +243,31 @@
         <span class="lightbox-close" title="關閉 (Esc)">&times;</span>
 
         <!-- 工具列 -->
-        <div class="lightbox-toolbar">
+        <div class="lightbox-toolbar" id="lt-debug">
             <!-- 縮放控制 -->
-            <button class="lightbox-tool-btn" id="lightboxZoomIn" title="放大 (+)">
+            <button class="lightbox-tool-btn" id="lightboxZoomIn" title="放大 (+)" onclick="console.log('zoomIn clicked'); Lightbox.zoomIn();">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
                 </svg>
             </button>
-            <button class="lightbox-tool-btn" id="lightboxZoomOut" title="縮小 (-)">
+            <button class="lightbox-tool-btn" id="lightboxZoomOut" title="縮小 (-)" onclick="console.log('zoomOut clicked'); Lightbox.zoomOut();">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path>
                 </svg>
             </button>
-            <button class="lightbox-tool-btn" id="lightboxZoomReset" title="重置縮放 (0)">
+            <button class="lightbox-tool-btn" id="lightboxZoomReset" title="重置縮放 (0)" onclick="console.log('zoomReset clicked'); Lightbox.zoomReset();">
                 <span style="font-size: 14px; font-weight: 600;">100%</span>
             </button>
 
             <span class="lightbox-toolbar-divider"></span>
 
             <!-- 鏡射控制 -->
-            <button class="lightbox-tool-btn" id="lightboxFlipH" title="水平鏡射 (H)">
+            <button class="lightbox-tool-btn" id="lightboxFlipH" title="水平鏡射 (H)" onclick="console.log('flipH clicked'); Lightbox.flipHorizontal();">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                 </svg>
             </button>
-            <button class="lightbox-tool-btn" id="lightboxFlipV" title="垂直鏡射 (V)">
+            <button class="lightbox-tool-btn" id="lightboxFlipV" title="垂直鏡射 (V)" onclick="console.log('flipV clicked'); Lightbox.flipVertical();">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
                 </svg>
@@ -276,12 +276,12 @@
             <span class="lightbox-toolbar-divider"></span>
 
             <!-- 順時針/逆時針旋轉 -->
-            <button class="lightbox-tool-btn" id="lightboxRotateL" title="向左旋轉 (Q)">
+            <button class="lightbox-tool-btn" id="lightboxRotateL" title="向左旋轉 (Q)" onclick="console.log('rotateL clicked'); Lightbox.rotateLeft();">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
             </button>
-            <button class="lightbox-tool-btn" id="lightboxRotateR" title="向右旋轉 (E)">
+            <button class="lightbox-tool-btn" id="lightboxRotateR" title="向右旋轉 (E)" onclick="console.log('rotateR clicked'); Lightbox.rotateRight();">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m0 0a8.001 8.001 0 0115.356 2M4.582 9H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
