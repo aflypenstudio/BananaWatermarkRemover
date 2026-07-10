@@ -2020,14 +2020,17 @@ const Lightbox = {
         const img = this.elements.img;
         const { panX, panY } = this;
 
-        console.log('applyTransform:', { scale, flipH, flipV, rotation, panX, panY });
-
         let transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-        transform += ` scaleX(${flipH ? -1 : 1}) scaleY(${flipV ? -1 : 1})`;
+        // 使用 rotateY 實現水平翻轉（scaleX 有時在某些瀏覽器不生效）
+        if (flipH) {
+            transform += ` rotateY(180deg)`;
+        }
+        if (flipV) {
+            transform += ` rotateX(180deg)`;
+        }
         transform += ` rotate(${rotation}deg)`;
 
         img.style.transform = transform;
-        console.log('Transform set:', transform);
     },
 
     resetState() {
