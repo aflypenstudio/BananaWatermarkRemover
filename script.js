@@ -1909,14 +1909,14 @@ const Lightbox = {
 
         // 填入當前設定值
         if (processor) {
-            const strength = processor.state.detectedStrength || 1;
+            const strength = processor.config.alphaGain || 1;
             document.getElementById('settingsStrength').value = strength;
             document.getElementById('settingsStrengthValue').textContent = strength.toFixed(2);
 
-            const position = processor.state.maskingMode || 'auto';
+            const position = processor.config.forcePosition || 'auto';
             document.querySelector(`input[name="settingsPosition"][value="${position}"]`).checked = true;
 
-            const size = processor.state.sizeMode || 'auto';
+            const size = processor.config.forceMode || 'auto';
             document.querySelector(`input[name="settingsSize"][value="${size}"]`).checked = true;
         } else {
             document.getElementById('settingsStrength').value = 1;
