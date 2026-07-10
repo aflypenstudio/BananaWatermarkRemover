@@ -2019,11 +2019,14 @@ const Lightbox = {
         const { scale, flipH, flipV, rotation, panX, panY } = this.state;
         const img = this.elements.img;
 
+        console.log('applyTransform:', { scale, flipH, flipV, rotation, panX, panY });
+
         let transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
         transform += ` scaleX(${flipH ? -1 : 1}) scaleY(${flipV ? -1 : 1})`;
         transform += ` rotate(${rotation}deg)`;
 
         img.style.transform = transform;
+        console.log('Transform set:', transform);
     },
 
     resetState() {
