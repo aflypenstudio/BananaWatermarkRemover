@@ -1971,10 +1971,10 @@ const Lightbox = {
         const position = document.querySelector('input[name="settingsPosition"]:checked').value;
         const size = document.querySelector('input[name="settingsSize"]:checked').value;
 
-        // 更新 processor 設定
-        processor.state.detectedStrength = strength;
-        processor.state.maskingMode = position;
-        processor.state.sizeMode = size;
+        // 更新 processor config（Worker 使用這些值）
+        processor.config.alphaGain = strength;
+        processor.config.forcePosition = position;
+        processor.config.forceMode = size;
 
         // 重新處理
         processor.processAndRender();
