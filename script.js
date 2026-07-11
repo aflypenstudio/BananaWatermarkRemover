@@ -1638,8 +1638,6 @@ if (outputToggleHeader) {
 }
 
 // Global Intensity Settings 折疊/展開
-const globalIntensityToggleHeader = document.getElementById('globalIntensityToggleHeader');
-
 if (globalIntensityToggleHeader) {
     globalIntensityToggleHeader.addEventListener('click', (e) => {
         // 如果點擊的是重置按鈕或控制項，不觸發展開/收合
