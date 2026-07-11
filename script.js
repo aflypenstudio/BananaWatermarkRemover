@@ -1628,10 +1628,26 @@ if (logoToggleHeader) {
 // Output Settings 折疊/展開
 const outputSettings = document.getElementById('outputSettings');
 const outputToggleHeader = document.getElementById('outputToggleHeader');
+const globalIntensitySection = document.getElementById('globalIntensitySection');
+const globalIntensityToggleHeader = document.getElementById('globalIntensityToggleHeader');
 
 if (outputToggleHeader) {
     outputToggleHeader.addEventListener('click', (e) => {
         outputSettings.classList.toggle('collapsed');
+    });
+}
+
+// Global Intensity Settings 折疊/展開
+const globalIntensityToggleHeader = document.getElementById('globalIntensityToggleHeader');
+
+if (globalIntensityToggleHeader) {
+    globalIntensityToggleHeader.addEventListener('click', (e) => {
+        // 如果點擊的是重置按鈕或控制項，不觸發展開/收合
+        if (e.target.closest('#globalIntensityReset') ||
+            e.target.closest('.global-intensity-controls') ||
+            e.target.closest('input')) return;
+
+        globalIntensitySection.classList.toggle('collapsed');
     });
 }
 

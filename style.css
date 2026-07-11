@@ -414,30 +414,29 @@ body.has-files .app-card {
   /* ========================================
      Mobile: Global Intensity Section
      ======================================== */
-  .global-intensity-section {
-    padding: 0.75rem 1rem;
-  }
-
-  .global-intensity-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
+  #globalIntensitySection .logo-header {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
   }
 
   .global-intensity-hint {
     font-size: 0.7rem;
+    margin-left: auto;
+    padding-right: 0;
+    flex-shrink: 0;
   }
 
   .global-intensity-controls {
     flex-wrap: wrap;
     gap: 0.5rem;
+    padding: 0.25rem 0;
   }
 
   #globalIntensitySlider {
     flex: 1 1 100%;
     order: -1;
-    width: 100%;
-    margin-bottom: -0.25rem;
+    max-width: 100%;
+    margin-bottom: 0;
   }
 
   .global-intensity-btn {
@@ -739,42 +738,35 @@ body.has-files .app-card {
   gap: 0.5rem;
 }
 
-/* Global Intensity Section */
+/* Global Intensity Section - 使用與 Logo Settings 相同的結構 */
 .global-intensity-section {
-    background-color: rgba(124, 58, 237, 0.1);
-    border: 1px solid rgba(124, 58, 237, 0.3);
-    border-radius: 0.75rem;
-    padding: 1rem 1.5rem;
-    margin-bottom: 1rem;
-}
-
-[data-theme="light"] .global-intensity-section {
-    background-color: rgba(124, 58, 237, 0.05);
-    border-color: rgba(124, 58, 237, 0.2);
+    /* 整合到 logo-settings 結構中 */
 }
 
 .global-intensity-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
 }
 
 .global-intensity-title {
     font-weight: 600;
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: 1rem;
 }
 
 .global-intensity-hint {
     font-size: 0.75rem;
     color: var(--text-secondary);
+    margin-left: auto;
+    padding-right: 0.5rem;
 }
 
 .global-intensity-controls {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    padding: 0.5rem 0;
 }
 
 .global-intensity-btn {
@@ -808,6 +800,7 @@ body.has-files .app-card {
 
 #globalIntensitySlider {
     flex: 1;
+    max-width: 300px;
     height: 6px;
     accent-color: #7c3aed;
     cursor: pointer;
