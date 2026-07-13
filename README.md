@@ -27,6 +27,10 @@ This project is a **modified version** focused on watermark removal with additio
   - **Auto Positioning**: Logo automatically centers on the detected watermark position
   - **Consistent Size**: Logo size calculated based on image's shorter edge (same size for landscape & portrait)
   - **Adjustable Settings**: Opacity 0% ~ 100% (default: 20%), Size 10% ~ 300% (default: 200%)
+- **📊 Unified Intensity Adjustment**: Apply to all images at once (overrides individual settings):
+  - **Cancels Individual Settings**: Sets all images to auto-detect, then applies same adjustment
+  - **Step Precision**: 0.05 adjustment step
+  - **Range**: -0.15 to +0.15 (on top of auto-detected strength)
 - **🔧 Output Options**:
   - **Resize Presets**: 1280×720 / 1920×1080 (or disable)
   - **Keep EXIF**: Preserve original image metadata
